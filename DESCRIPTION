@@ -19,8 +19,9 @@ Imports:
     zoo,
     forecast,
     signal,
-    ggplot2,
-    dplyr
+    ggplot2
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 5.0.0
+URL: http://github.com/jashu/itrak
+BugReports: http://github.com/jashu/itrak/issues

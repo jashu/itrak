@@ -1,0 +1,26 @@
+Package: itrak
+Type: Package
+Title: Tools for cleaning eye-tracking data
+Version: 0.0.0.9000
+Date: 2015-08-02
+Authors@R: person("Jason", "Shumake", email = "shumake@utexas.edu",
+  role = c("aut","cre"))
+Description: Set of tools for cleaning data from eye-tracking systems. This
+    initial release fixes problems with pupil-dilation time series and
+    includes functions for correcting signal artifacts, normalizing to a
+    baseline reference period, and extracting low-frequency pupil-dilation
+    signals from high-frequency noise. Future releases may expand
+    functionality to address eye-gaze-direction data as well.
+Depends:
+    R (>= 3.2),
+    stats,
+    methods
+Imports:
+    zoo,
+    forecast,
+    signal,
+    ggplot2,
+    dplyr
+License: GPL-3
+LazyData: TRUE
+RoxygenNote: 5.0.0

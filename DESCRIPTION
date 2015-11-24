@@ -22,6 +22,6 @@ Imports:
     ggplot2
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 5.0.0
+RoxygenNote: 5.0.1
 URL: http://github.com/jashu/itrak
 BugReports: http://github.com/jashu/itrak/issues

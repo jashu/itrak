@@ -3,5 +3,6 @@
 export(fix_artifacts)
 export(get_artifacts)
 export(get_tlbs)
+export(low_pass_filter)
 export(normalize)
 export(plot_artifacts)

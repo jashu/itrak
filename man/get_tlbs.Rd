@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_tlbs.R
 \name{get_tlbs}
 \alias{get_tlbs}
-\title{Trial level bias score}
+\title{Trial level bias score.}
 \usage{
 get_tlbs(measure, type, reference = NULL, search_limit = 5)
 }
@@ -16,7 +16,7 @@ dichotomous factor (having exactly 2 levels) or convertible to such.}
 
 \item{reference}{Value indicating which level of trial \code{type} should
 come first when subtracting trials of opposite type to generate a bias score
-(bias = \code{reference} type - opposite type). If \code{type} is of class
+\eqn{bias = reference type - opposite type}. If \code{type} is of class
 \code{factor}, defaults to the first level; otherwise defaults to the trial
 type that comes first alphanumerically.}
 
@@ -28,8 +28,28 @@ trial of opposite type. Default value is 5. If no match is found within the
 A vector of bias scores for each trial.
 }
 \description{
-\code{get_tlbs} Given an ordered series of trials of dichotomous type,
-each trial is matched with the trial of opposite type that is most temporally
-proximal, and the difference score is returned.
+\code{get_tlbs} matches each trial (in an ordered series of trials of
+dichotomous type) to the most temporally proximal trial of opposite type
+and returns the difference.
+}
+\examples{
+# Create example time series of 10 reaction times in ms:
+rt <- sample(1000:10000, 10)
+# Create example trial types of congruent vs. incongruent for above measures:
+trial_type <- sample(c("congruent","incongruent"), 10, replace = TRUE)
+# By default, "congruent" is treated as the reference because of alphabetical
+# order, so incongruent trials will be subtracted from congruent trials:
+get_tlbs(measure = rt, type = trial_type)
+# To subtract congruent trials from incongruent trials, specify "incongruent"
+# using the reference argument:
+get_tlbs(rt, trial_type, reference = "incongruent")
+# Or, if type is converted to a factor variable with "incongruent" as the
+# reference level, then congruent trials will be subtracted from incongruent
+# by default:
+trial_type <- factor(trial_type, levels = c("incongruent", "congruent"))
+get_tlbs(rt, trial_type)
+# Calculate the bias score using the nearest trial within 3 trials:
+get_tlbs(rt, trial_type, search_limit = 3)
+
 }
 

@@ -42,6 +42,7 @@
 #' # Calculate the bias score using the nearest trial within 3 trials:
 #' get_tlbs(rt, trial_type, search_limit = 3)
 #'
+#' @seealso \code{\link{get_bs}} for mean bias score
 #' @export
 
 get_tlbs <- function(measure, type, reference = NULL, search_limit = 5){

@@ -39,6 +39,7 @@
 #' trial_type <- factor(trial_type, levels = c("incongruent", "congruent"))
 #' get_bs(rt, trial_type)
 #'
+#' @seealso \code{\link{get_tlbs}} for trial-level bias score
 #' @export
 
 get_bs <- function(measure, type, reference = NULL){

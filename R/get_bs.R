@@ -1,8 +1,7 @@
-#' Trial level bias score.
+#' Mean bias score.
 #'
-#' \code{get_tlbs} matches each trial (in an ordered series of trials of
-#' dichotomous type) to the most temporally proximal trial of opposite type
-#' and returns the difference.
+#' \code{get_bs} returns the mean difference between trials of dichotomous
+#' type.
 #'
 #' @param measure A vector of chronologically ordered observations of numeric
 #'  type.
@@ -17,56 +16,38 @@
 #'  \code{factor}, defaults to the first level; otherwise defaults to the trial
 #'  type that comes first alphanumerically.
 #'
-#' @param search_limit How many trials to look forward or backward to find a
-#'  trial of opposite type. Default value is 5. If no match is found within the
-#'  \code{search_limit} of a trial, \code{NA} will be returned for that trial.
-#'
-#' @return A vector of bias scores for each trial.
+#' @return A length-one numeric vector.
 #'
 #' @examples
 #' # Create example time series of 10 reaction times in ms:
 #' rt <- sample(1000:10000, 10)
+#'
 #' # Create example trial types of congruent vs. incongruent for above measures:
 #' trial_type <- sample(c("congruent","incongruent"), 10, replace = TRUE)
+#'
 #' # By default, "congruent" is treated as the reference because of alphabetical
 #' # order, so incongruent trials will be subtracted from congruent trials:
-#' get_tlbs(measure = rt, type = trial_type)
+#' get_bs(measure = rt, type = trial_type)
+#'
 #' # To subtract congruent trials from incongruent trials, specify "incongruent"
 #' # using the reference argument:
-#' get_tlbs(rt, trial_type, reference = "incongruent")
+#' get_bs(rt, trial_type, reference = "incongruent")
+#'
 #' # Or, if type is converted to a factor variable with "incongruent" as the
 #' # reference level, then congruent trials will be subtracted from incongruent
 #' # by default:
 #' trial_type <- factor(trial_type, levels = c("incongruent", "congruent"))
-#' get_tlbs(rt, trial_type)
-#' # Calculate the bias score using the nearest trial within 3 trials:
-#' get_tlbs(rt, trial_type, search_limit = 3)
+#' get_bs(rt, trial_type)
 #'
 #' @export
 
-get_tlbs <- function(measure, type, reference = NULL, search_limit = 5){
+get_bs <- function(measure, type, reference = NULL){
   if(length(measure) != length(type))
     stop("Measure and type must contain the same number of trials.")
   if(length(unique(na.omit(type))) != 2)
     stop("There must be exactly two types of trials.")
   if(is.null(reference))
     reference <- ifelse(is.factor(type), levels(type)[1], sort(unique(type))[1])
-  tlbs <- vector("numeric", length(measure))
-  for(i in seq_along(tlbs)){
-    begin <- i - search_limit
-    if(begin < 1) begin <- 1
-    end <- i + search_limit
-    if(end > length(tlbs)) end = length(tlbs)
-    trials <- begin:end
-    candidates <- trials[type[begin:end] != type[i]]
-    if(length(candidates) == 0){
-      tlbs[i] <- NA_real_
-      next
-    }
-    trial_dist <- abs(i - candidates)
-    match <- candidates[which.min(trial_dist)]
-    temp_tlbs <- measure[i] - measure[match]
-    tlbs[i] <- ifelse(type[i] == reference, temp_tlbs, -1*temp_tlbs)
-  }
-  return(tlbs)
+  mean(measure[type == reference], na.rm = T) -
+    mean(measure[type != reference], na.rm = T)
 }

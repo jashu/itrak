@@ -1,4 +1,4 @@
-#' Mean bias score.
+#' Mean bias score
 #'
 #' \code{get_bs} returns the mean difference between trials of dichotomous
 #' type.

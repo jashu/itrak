@@ -2,7 +2,7 @@
 % Please edit documentation in R/is_valid.R
 \name{is_valid}
 \alias{is_valid}
-\title{Valid trials.}
+\title{Valid trials}
 \usage{
 is_valid(measure, limit, type)
 }

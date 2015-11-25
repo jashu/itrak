@@ -19,7 +19,8 @@ Imports:
     zoo,
     forecast,
     signal,
-    ggplot2
+    ggplot2,
+    dplyr
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 5.0.1

@@ -1,4 +1,4 @@
-#' Trial level bias score.
+#' Trial level bias score
 #'
 #' \code{get_tlbs} matches each trial (in an ordered series of trials of
 #' dichotomous type) to the most temporally proximal trial of opposite type
@@ -26,19 +26,24 @@
 #' @examples
 #' # Create example time series of 10 reaction times in ms:
 #' rt <- sample(1000:10000, 10)
+#'
 #' # Create example trial types of congruent vs. incongruent for above measures:
 #' trial_type <- sample(c("congruent","incongruent"), 10, replace = TRUE)
+#'
 #' # By default, "congruent" is treated as the reference because of alphabetical
 #' # order, so incongruent trials will be subtracted from congruent trials:
 #' get_tlbs(measure = rt, type = trial_type)
+#'
 #' # To subtract congruent trials from incongruent trials, specify "incongruent"
 #' # using the reference argument:
 #' get_tlbs(rt, trial_type, reference = "incongruent")
+#'
 #' # Or, if type is converted to a factor variable with "incongruent" as the
 #' # reference level, then congruent trials will be subtracted from incongruent
 #' # by default:
 #' trial_type <- factor(trial_type, levels = c("incongruent", "congruent"))
 #' get_tlbs(rt, trial_type)
+#'
 #' # Calculate the bias score using the nearest trial within 3 trials:
 #' get_tlbs(rt, trial_type, search_limit = 3)
 #'

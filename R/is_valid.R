@@ -1,4 +1,4 @@
-#' Valid trials.
+#' Valid trials
 #'
 #' \code{is_valid} indicates which trials fall within a valid range of values.
 #'

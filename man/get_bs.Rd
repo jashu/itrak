@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_bs.R
 \name{get_bs}
 \alias{get_bs}
-\title{Mean bias score.}
+\title{Mean bias score}
 \usage{
 get_bs(measure, type, reference = NULL)
 }

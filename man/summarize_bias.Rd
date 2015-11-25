@@ -29,6 +29,32 @@ look forward or backward to find a trial of opposite type. Default value is
 5. If no match is found within the \code{search_limit} of a trial, \code{NA}
 will be assigned to that trial.}
 }
+\value{
+An object of the same class as \code{data} with the following
+summary metrics:
+\describe{
+ \item{mean_bias}{Traditional bias score obtained by taking the mean of one
+ trial type and subtracting it from the mean of the opposite trial type.}
+ \item{mean_toward}{Mean bias toward the target stimulus obtained by
+ calculating the mean of the positive trial-level bias scores.}
+ \item{mean_away}{Mean bias away from the target stimulus obtained by
+ calculating the mean of the negative trial-level bias scores.}
+ \item{max_toward}{Maximum bias toward the target stimulus obtained by
+ calculating the maximum trial-level bias score.}
+ \item{max_away}{Maximum bias away from the target stimulus obtained by
+ calculating the minimum (most negative) trial-level bias score.}
+ \item{variance}{Variability in bias obtained by calculating the mean of the
+ absolute value of the lag-1 differences in trial-level bias scores.}
+ \item{trials_toward}{Number of trials during which bias was directed toward
+ the target.}
+ \item{trials_away}{Number of trials when bias was directed away from the
+ target.}
+ \item{trials_NA}{Number of trials for which a trial-level bias score could
+ not be computed, i.e., a trial of opposite type could not be found within
+ the \code{search_limit}}
+ \item{trials_total}{Total number of trials.}
+ }
+}
 \description{
 \code{summarize_bias} combines the \code{\link{get_bs}} and
 \code{\link{get_tlbs}} functions to generate a traditional attention bias

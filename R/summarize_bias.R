@@ -71,6 +71,7 @@
 #'  not be computed, i.e., a trial of opposite type could not be found within
 #'  the \code{search_limit}}
 #'  \item{trials_total}{Total number of trials.}
+#'  }
 #'
 #' @examples
 #' # Create example data frame containing 10 time series of 10 reaction times
@@ -109,5 +110,6 @@ summarize_bias <- function(data, measure, trial_type, reference = NULL,
                    variance = mean(abs(diff(tlbs)), na.rm = T),
                    trials_toward = sum(!is.na(tlbs[tlbs > 0])),
                    trials_away = sum(!is.na(tlbs[tlbs < 0])),
+                   trials_NA = sum(is.na(tlbs)),
                    trials_total = n())
 }

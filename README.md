@@ -16,7 +16,7 @@ To install `itrak` in R, you first need to install the `devtools` package if you
 
 Once `devtools` is installed, use the following command to install `itrak` on your system:
 
-	`devtools::install_github(“jashu/itrak")`
+	`devtools::install_github("jashu/itrak")`
 
 After that, load it as you would any package:
 	

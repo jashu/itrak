@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_tlbs.R
 \name{get_tlbs}
 \alias{get_tlbs}
-\title{Trial level bias score}
+\title{Trial-level Bias Score}
 \usage{
 get_tlbs(measure, type, reference = NULL, search_limit = 5)
 }
@@ -25,12 +25,13 @@ trial of opposite type. Default value is 5. If no match is found within the
 \code{search_limit} of a trial, \code{NA} will be returned for that trial.}
 }
 \value{
-A vector of bias scores for each trial.
+A vector of trial-level bias scores.
 }
 \description{
-\code{get_tlbs} matches each trial (in an ordered series of trials of
-dichotomous type) to the most temporally proximal trial of opposite type
-and returns the difference.
+\code{get_tlbs} calculates the trial-level bias score (TL-BS) as described by
+Zvielli et al. (2015). In computational terms, it matches each trial (in an
+ordered series of trials of dichotomous type) to the most temporally proximal
+trial of opposite type and returns the difference.
 }
 \examples{
 # Create example time series of 10 reaction times in ms:
@@ -57,7 +58,11 @@ get_tlbs(rt, trial_type)
 get_tlbs(rt, trial_type, search_limit = 3)
 
 }
+\references{
+Zvielli A, Bernstein A, Koster EHW. 2015. Temporal dynamics of
+attentional bias. \emph{Clinical Psychological Science}. 3(5):772-788.
+}
 \seealso{
-\code{\link{get_bs}} for mean bias score
+\code{\link{summarize_bias}}, \code{\link{get_bs}}
 }
 

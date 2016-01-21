@@ -1,8 +1,14 @@
-#' Trial level bias score
+#' Trial-level Bias Score
 #'
-#' \code{get_tlbs} matches each trial (in an ordered series of trials of
-#' dichotomous type) to the most temporally proximal trial of opposite type
-#' and returns the difference.
+#' \code{get_tlbs} calculates the trial-level bias score (TL-BS) as described by
+#' Zvielli et al. (2015). In computational terms, it matches each trial (in an
+#' ordered series of trials of dichotomous type) to the most temporally proximal
+#' trial of opposite type and returns the difference.
+#'
+#' @references Zvielli A, Bernstein A, Koster EHW. 2015. Temporal dynamics of
+#' attentional bias. \emph{Clinical Psychological Science}. 3(5):772-788.
+#'
+#' @seealso \code{\link{summarize_bias}}, \code{\link{get_bs}}
 #'
 #' @param measure A vector of chronologically ordered observations of numeric
 #'  type.
@@ -21,7 +27,7 @@
 #'  trial of opposite type. Default value is 5. If no match is found within the
 #'  \code{search_limit} of a trial, \code{NA} will be returned for that trial.
 #'
-#' @return A vector of bias scores for each trial.
+#' @return A vector of trial-level bias scores.
 #'
 #' @examples
 #' # Create example time series of 10 reaction times in ms:
@@ -47,7 +53,6 @@
 #' # Calculate the bias score using the nearest trial within 3 trials:
 #' get_tlbs(rt, trial_type, search_limit = 3)
 #'
-#' @seealso \code{\link{get_bs}} for mean bias score
 #' @export
 
 get_tlbs <- function(measure, type, reference = NULL, search_limit = 5){

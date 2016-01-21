@@ -2,7 +2,8 @@
 #'
 #' \code{summarize_bias} combines the \code{\link{get_bs}} and
 #' \code{\link{get_tlbs}} functions to generate a traditional attention bias
-#' metric as well as summary metrics of trial-level attention bias.
+#' metric as well as summary metrics of trial-level attention bias
+#' (Zvielli et al., 2015).
 #'
 #' @section IMPORTANT:
 #' Before calling this function, ensure that the data being passed have been
@@ -26,6 +27,9 @@
 #' \code{\link[dplyr]{arrange}}. (Do NOT include \code{trial} in the call to
 #' \code{\link[dplyr]{group_by}}.) The result is then ready to be piped to the
 #' \code{summarize_bias} function.
+#'
+#' @references Zvielli A, Bernstein A, Koster EHW. 2015. Temporal dynamics of
+#' attentional bias. \emph{Clinical Psychological Science}. 3(5):772-788.
 #'
 #' @param data A data frame or table.
 #'

@@ -58,7 +58,8 @@ summary metrics:
 \description{
 \code{summarize_bias} combines the \code{\link{get_bs}} and
 \code{\link{get_tlbs}} functions to generate a traditional attention bias
-metric as well as summary metrics of trial-level attention bias.
+metric as well as summary metrics of trial-level attention bias
+(Zvielli et al., 2015).
 }
 \section{IMPORTANT}{
 
@@ -102,6 +103,10 @@ arrange(id, trial) \%>\%
 group_by(id) \%>\%
 summarize_bias(measure = rt, trial_type = type, reference = 'incon')
 
+}
+\references{
+Zvielli A, Bernstein A, Koster EHW. 2015. Temporal dynamics of
+attentional bias. \emph{Clinical Psychological Science}. 3(5):772-788.
 }
 \seealso{
 \code{\link{get_bs}}, \code{\link{get_tlbs}},

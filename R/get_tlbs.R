@@ -62,7 +62,7 @@ get_tlbs <- function(measure, type, reference = NULL, search_limit = 5){
     begin <- i - search_limit
     if(begin < 1) begin <- 1
     end <- i + search_limit
-    if(end > length(tlbs)) end = length(tlbs)
+    if(end > length(tlbs)) end <- length(tlbs)
     trials <- begin:end
     candidates <- trials[type[begin:end] != type[i]]
     if(length(candidates) == 0){

@@ -38,29 +38,74 @@ summary metrics:
  \item{mean_toward}{Mean bias toward the target stimulus obtained by
  calculating the mean of the positive trial-level bias scores.}
  \item{mean_away}{Mean bias away from the target stimulus obtained by
- calculating the mean of the negative trial-level bias scores.}
- \item{max_toward}{Maximum bias toward the target stimulus obtained by
- calculating the maximum trial-level bias score.}
- \item{max_away}{Maximum bias away from the target stimulus obtained by
- calculating the minimum (most negative) trial-level bias score.}
- \item{variance}{Variability in bias obtained by calculating the mean of the
- absolute value of the lag-1 differences in trial-level bias scores.}
+  calculating the absolute value of the mean of the negative trial-level bias
+  scores.}
+ \item{peak_toward}{Maximum bias toward the target stimulus obtained by
+   calculating the maximum trial-level bias score.}
+ \item{peak_away}{Maximum bias away from the target stimulus obtained by
+   calculating the absolute value of the minimum (most negative) trial-level
+   bias score.}
+ \item{variability}{Variability in bias obtained by calculating the mean of
+   the absolute value of the lag-1 differences in trial-level bias scores.}
  \item{trials_toward}{Number of trials during which bias was directed toward
- the target.}
- \item{trials_away}{Number of trials when bias was directed away from the
- target.}
+   the target.}
+ \item{trials_away}{Number of trials during which bias was directed away from
+   the target.}
  \item{trials_NA}{Number of trials for which a trial-level bias score could
- not be computed, i.e., a trial of opposite type could not be found within
- the \code{search_limit}}
+   not be computed, i.e., a trial of opposite type could not be found within
+   the \code{search_limit}}
  \item{trials_total}{Total number of trials.}
  }
 }
 \description{
 \code{summarize_bias} combines the \code{\link{get_bs}} and
 \code{\link{get_tlbs}} functions to generate a traditional attention bias
-metric as well as summary metrics of trial-level attention bias
-(Zvielli et al., 2015).
+metric as well as summary metrics of trial-level attention bias as described
+by Zvielli et al. (2015).
 }
+\section{Departures from Zvielli et al.}{
+
+The names of the trial-level bias score (TL-BS) parameters and the methods
+for calculating them adhere closely to those used and described by Zvielli et
+al. (2015). There are two exceptions.
+\enumerate{
+ \item Zvielli et al.'s Mean TL-BS POSITIVE and Peak TL-BS POSITIVE are
+   labeled here as \code{mean_toward} and \code{peak_toward}, respectively.
+   In their discussion of these parameters, Zvielli et al. also refer to them
+   as "the \emph{toward} parameters." This terminology is favored because it
+   is more descriptive and disambiguates the direction of attention from the
+   target of attention. (For example, "bias toward negative stimuli" is
+   clearer than "positive bias for negative stimuli.") For the same reason,
+   Zvielli et al.'s Mean TL-BS NEGATIVE and Peak TL-BS NEGATIVE are labeled
+   here as \code{mean_away} and \code{peak_away}, respectively.
+ \item Calculation of the TL-BS parameters is implemented precisely as
+   described by Zvielli et al. with one minor modification: after taking the
+   mean and min of the negative trial-level bias scores to obtain the
+   \code{mean_away} and \code{peak_away} parameters, resepectively, the
+   results are multiplied by -1 to remove the negative sign. The rationale
+   for this modification is as follows. First, leaving the negative sign in
+   place is redundant since the direction of the bias is given by the name of
+   the parameter. Second, and more problematic, scales that only have a
+   negative vector (i.e., increasing effects are represented by decreasing
+   numbers) are prone to misinterpretation. This is because statistical
+   models will not know that increasing attention bias is scaled in a
+   negative direction--increases are always defined as moving to the right
+   on the \emph{x} axis, i.e., becoming more positive--so one must remember
+   that an increase on the bias-away scale is actually a decrease in
+   attention bias in order to interpret results correctly. For example, if
+   one finds a positive correlation between bias-away and some other
+   (positively scaled) variable, then one must perform the mental gymnastics
+   of a) realizing that a positive correlation means that an increase on the
+   bias-away scale (becoming less negative) is associated with an increase
+   in the other variable and b) recalling that an increase on the bias-away
+   scale actually reflects a decrease in attention bias before c) coming to
+   the correct, but counter-intutitive conclusion, that a positive
+   correlation in this case reflects a negative relationship. Converting
+   \code{mean_away} and \code{peak_away} to a positive scale spares the user
+   from this future headache.
+   }
+}
+
 \section{IMPORTANT}{
 
 Before calling this function, ensure that the data being passed have been

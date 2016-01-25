@@ -1,8 +1,8 @@
 Package: itrak
 Type: Package
 Title: Tools for processing eye-tracking data
-Version: 0.0.0.9001
-Date: 2016-01-21
+Version: 0.0.0.9002
+Date: 2016-01-25
 Authors@R: person("Jason", "Shumake", email = "shumake@utexas.edu",
   role = c("aut","cre"))
 Description: Set of tools for cleaning data from eye-tracking systems. This

@@ -69,7 +69,8 @@ get_tlbs <- function(measure, type, reference = NULL, search_limit = 5){
     end <- i + search_limit
     if(end > length(tlbs)) end <- length(tlbs)
     trials <- begin:end
-    candidates <- trials[type[begin:end] != type[i]]
+    candidates <- trials[type[begin:end] != type[i] &
+                           !is.na(measure[begin:end])]
     if(length(candidates) == 0){
       tlbs[i] <- NA_real_
       next

@@ -5,12 +5,11 @@ Version: 0.0.0.9002
 Date: 2016-01-25
 Authors@R: person("Jason", "Shumake", email = "shumake@utexas.edu",
   role = c("aut","cre"))
-Description: Set of tools for cleaning data from eye-tracking systems. This
-    initial release fixes problems with pupil-dilation time series and
-    includes functions for correcting signal artifacts, normalizing to a
-    baseline reference period, and extracting low-frequency pupil-dilation
-    signals from high-frequency noise. Future releases may expand
-    functionality to address eye-gaze-direction data as well.
+Description: Provides functions to facilitate the processing of data from
+    visual attention experiments. The functions can be divided into two main
+    categories: attention bias and pupillometry. In addition, more generic
+    functions are provided to address common data-cleaning chores associated
+    with multi-trial experimental data.
 Depends:
     R (>= 3.2),
     stats,

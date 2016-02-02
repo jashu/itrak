@@ -2,17 +2,18 @@
 #'
 #' \code{is_outlier} flags which observations fall outside a valid range of
 #' values based on limits set by the user. Limits can be set in absolute
-#' terms (the units of measurement), standard deviations, or both.
+#' terms (the units of measurement), median absolute deviations, standard
+#' deviations, or any combination of the above.
 #'
-#' If both absolute and standard-deviation limits are specified, then
-#' \code{is_outlier} will first apply the absolute-deviation test, followed
-#' by the standard-deviation test for only those observations that pass the
-#' absolute-deviation test (so that values that are outright impossible do not
-#' factor into the determination of standard deviation).
+#' If more than one type of limit is specified, \code{is_outlier} will first
+#' apply the absolute limits if given (so that values that are outright
+#' impossible do not factor into the determination of the deviation statistics),
+#' followed by the median-absolute-deviation (MAD) test and/or the
+#' standard-deviation test.
 #'
-#' \code{is_outlier} uses a robust version of median absolute deviation to
-#' estimate the population standard deviation, which remains valid even for
-#' non-normal and/or asymmetric distributions. See \href{
+#' The \code{mad_lim} argument is evaluated using the \emph{double MAD}, which
+#' provides for robust identification of outliers even when the underlying
+#' distribution is non-normal and/or asymmetric. See \href{
 #' http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{
 #' Peter Rosenmai's blog post} for more information.
 #'
@@ -24,11 +25,14 @@
 #' be set such that values that fall outside of it are considered implausible or
 #' impossible.
 #'
-#' @param sd_lim Numeric value specifying the \emph{relative} range of valid
-#' values in terms of \emph{standard deviation}.
+#' @param mad_lim Numeric value specifying the range of valid values in terms of
+#' \emph{median absolute deviations} from the median.
 #'
-#' @return A logical vector indicating \code{TRUE} if the trial is outside the
-#' given range of valid values.
+#' @param sd_lim Numeric value specifying the range of valid values in terms of
+#'  \emph{standard deviations} from the mean.
+#'
+#' @return A logical vector indicating \code{TRUE} if an observation is an
+#'  outlier.
 #'
 #' @examples
 #' # Create example time series of 10 reaction times in ms with two trials that
@@ -42,6 +46,10 @@
 #' # Check for trials that are more than 2 standard deviations from the mean
 #' is_outlier(rt, sd_lim = 2)
 #'
+#' # Check for trials that are more than 3 median absolute deviations from the
+#' # median
+#' is_outlier(rt, mad_lim = 3)
+#'
 #' # Check for trials that are less than 250 ms, more than 2500 ms, or more than
 #' # 2 standard deviations from the mean:
 #' is_outlier(rt, abs_lim = c(250, 2500), sd_lim = 2)
@@ -52,21 +60,26 @@
 #'
 #' @export
 
-is_outlier <- function(measure, abs_lim = NULL, sd_lim = NULL){
-  if(is.null(abs_lim) && is.null(sd_lim))
-    stop("You must specify either `abs_lim` or `sd_lim`.")
+is_outlier <- function(measure, abs_lim = NULL, mad_lim = NULL, sd_lim = NULL){
+  if(is.null(abs_lim) && is.null(mad_lim) && is.null(sd_lim))
+    stop("You must specify at least one `_lim` argument.")
   if(!is.numeric(measure))
     stop("The measure is not stored as a numeric type.")
   if(!is.null(abs_lim) && (length(abs_lim) != 2 || !is.numeric(abs_lim)))
     stop("The absolute limit must be given as a two-element vector.")
+  if(!is.null(mad_lim) && (length(mad_lim) != 1 || !is.numeric(mad_lim)))
+    stop("The MAD limit must be a single number.")
   if(!is.null(sd_lim) && (length(sd_lim) != 1 || !is.numeric(sd_lim)))
     stop("The stand. dev. limit must be a single number.")
   outlier <- rep(FALSE, length(measure))
   if(!is.null(abs_lim)){
     outlier <- !dplyr::between(measure, abs_lim[1], abs_lim[2])
   }
+  if(!is.null(mad_lim)){
+    outlier[!outlier] <- DoubleMADsFromMedian(measure[!outlier]) > mad_lim
+  }
   if(!is.null(sd_lim)){
-    outlier[!outlier] <- DoubleMADsFromMedian(measure[!outlier]) > sd_lim
+    outlier[!outlier] <- abs(scale(measure[!outlier])) > sd_lim
   }
   outlier
 }

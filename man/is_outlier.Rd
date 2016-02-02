@@ -4,7 +4,7 @@
 \alias{is_outlier}
 \title{Identify Outliers}
 \usage{
-is_outlier(measure, abs_lim = NULL, sd_lim = NULL)
+is_outlier(measure, abs_lim = NULL, mad_lim = NULL, sd_lim = NULL)
 }
 \arguments{
 \item{measure}{A numeric vector.}
@@ -15,28 +15,32 @@ range of valid values in terms of \emph{measurement units}. This range should
 be set such that values that fall outside of it are considered implausible or
 impossible.}
 
-\item{sd_lim}{Numeric value specifying the \emph{relative} range of valid
-values in terms of \emph{standard deviation}.}
+\item{mad_lim}{Numeric value specifying the range of valid values in terms of
+\emph{median absolute deviations} from the median.}
+
+\item{sd_lim}{Numeric value specifying the range of valid values in terms of
+\emph{standard deviations} from the mean.}
 }
 \value{
-A logical vector indicating \code{TRUE} if the trial is outside the
-given range of valid values.
+A logical vector indicating \code{TRUE} if an observation is an
+ outlier.
 }
 \description{
 \code{is_outlier} flags which observations fall outside a valid range of
 values based on limits set by the user. Limits can be set in absolute
-terms (the units of measurement), standard deviations, or both.
+terms (the units of measurement), median absolute deviations, standard
+deviations, or any combination of the above.
 }
 \details{
-If both absolute and standard-deviation limits are specified, then
-\code{is_outlier} will first apply the absolute-deviation test, followed
-by the standard-deviation test for only those observations that pass the
-absolute-deviation test (so that values that are outright impossible do not
-factor into the determination of standard deviation).
+If more than one type of limit is specified, \code{is_outlier} will first
+apply the absolute limits if given (so that values that are outright
+impossible do not factor into the determination of the deviation statistics),
+followed by the median-absolute-deviation (MAD) test and/or the
+standard-deviation test.
 
-\code{is_outlier} uses a robust version of median absolute deviation to
-estimate the population standard deviation, which remains valid even for
-non-normal and/or asymmetric distributions. See \href{
+The \code{mad_lim} argument is evaluated using the \emph{double MAD}, which
+provides for robust identification of outliers even when the underlying
+distribution is non-normal and/or asymmetric. See \href{
 http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{
 Peter Rosenmai's blog post} for more information.
 }
@@ -51,6 +55,10 @@ is_outlier(rt, abs_lim = c(250, Inf))
 
 # Check for trials that are more than 2 standard deviations from the mean
 is_outlier(rt, sd_lim = 2)
+
+# Check for trials that are more than 3 median absolute deviations from the
+# median
+is_outlier(rt, mad_lim = 3)
 
 # Check for trials that are less than 250 ms, more than 2500 ms, or more than
 # 2 standard deviations from the mean:

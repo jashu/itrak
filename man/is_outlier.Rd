@@ -53,20 +53,20 @@ rt
 # Check for trials that are less than 250 ms with no upper bound:
 is_outlier(rt, abs_lim = c(250, Inf))
 
-# Check for trials that are more than 2 standard deviations from the mean
-is_outlier(rt, sd_lim = 2)
+# Check for trials that are more than 3 standard deviations from the mean
+is_outlier(rt, sd_lim = 3)
 
 # Check for trials that are more than 3 median absolute deviations from the
 # median
 is_outlier(rt, mad_lim = 3)
 
 # Check for trials that are less than 250 ms, more than 2500 ms, or more than
-# 2 standard deviations from the mean:
-is_outlier(rt, abs_lim = c(250, 2500), sd_lim = 2)
+# 2.5 MADs from the median:
+is_outlier(rt, abs_lim = c(250, 2500), mad_lim = 2.5)
 
 }
 \references{
-Rosemani, P. 2013. \href{
+Rosenmai P. 2013. \href{
 http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{
 Using the median absolute deviation to find outliers.}
 }

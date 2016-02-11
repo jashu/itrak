@@ -46,7 +46,7 @@
 fix_artifacts = function(ts, samp_freq,
                          artifacts = NULL,
                          baseline = NULL,
-                         lim = c(-0.5, 0,5),
+                         lim = c(-0.5, 0.5),
                          max_gap = 1, ...){
   # if no logical vector of artifacts has been passed, run get_artifacts
   if(is.null(artifacts)){

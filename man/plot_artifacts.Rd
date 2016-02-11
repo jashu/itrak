@@ -31,8 +31,7 @@ artifact intervals marked in red with vertical dotted lines.
 Use this plotting function to evaluate the performance of the
 \code{\link{get_artifacts}} function on individual time series and the
 impact of changes to its threshold settings. If many artifacts are
-going undetected, try decreasing the \code{change_cutoff} and/or the
-\code{prepost_cutoff} values. If there are too many false positives, try
-increaasing one or both of these settings.
+going undetected, try decreasing the \code{max_velocity} setting. If there
+are too many false positives, try increaasing it.
 }
 

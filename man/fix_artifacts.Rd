@@ -5,7 +5,7 @@
 \title{Artifact correction}
 \usage{
 fix_artifacts(ts, samp_freq, artifacts = NULL, baseline = NULL,
-  lim = c(-0.5, 0, 5), max_gap = 1, ...)
+  lim = c(-0.5, 0.5), max_gap = 1, ...)
 }
 \arguments{
 \item{ts}{A time series, passed as a vector of chronologically ordered

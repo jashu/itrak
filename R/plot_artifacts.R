@@ -6,9 +6,8 @@
 #' Use this plotting function to evaluate the performance of the
 #' \code{\link{get_artifacts}} function on individual time series and the
 #' impact of changes to its threshold settings. If many artifacts are
-#' going undetected, try decreasing the \code{change_cutoff} and/or the
-#' \code{prepost_cutoff} values. If there are too many false positives, try
-#' increaasing one or both of these settings.
+#' going undetected, try decreasing the \code{max_velocity} setting. If there
+#' are too many false positives, try increaasing it.
 #'
 #' @param time Numeric vector corresponding to time. Will be plotted on the x-
 #' axis. Must be the same length as the \code{pupil} and \code{artifact}

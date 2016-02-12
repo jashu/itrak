@@ -4,24 +4,23 @@
 \alias{plot_artifacts}
 \title{Plot artifacts}
 \usage{
-plot_artifacts(time, pupil, artifacts, data = NULL, ...)
+plot_artifacts(data, time, pupil, artifacts, trial = NULL)
 }
 \arguments{
-\item{time}{Numeric vector corresponding to time. Will be plotted on the x-
-axis. Must be the same length as the \code{pupil} and \code{artifact}
-vectors.}
+\item{data}{Data frame containing time series.}
 
-\item{pupil}{Numeric vector containing the time series of pupil measurements.
-Will be plotted on the y-axis. Must be the same length as the \code{time}
-and \code{artifact} vectors.}
+\item{time}{Name of variable that gives time units. Will be plotted on the x-
+axis.}
 
-\item{artifacts}{Logical vector that indexes which observations in the
-\code{pupil} time series are artifacts. See \code{\link{get_artifacts}}.}
+\item{pupil}{Name of variable containing the time series of pupil measures.
+Will be plotted on the y-axis.}
 
-\item{data}{Data frame to use (optional).}
+\item{artifacts}{Name of variable containing logical vector that indexes
+which observations in the \code{pupil} time series are artifacts.
+See \code{\link{get_artifacts}}.}
 
-\item{...}{optional arguments to \code{\link[ggplot2]{qplot}},
-e.g., "main", "ylim", etc.}
+\item{trial}{If the data contains multiple time series, name of the variable
+that identifies each time series. Will be plotted using \code{facet_wrap}.}
 }
 \description{
 \code{plot_artifacts} returns a plot of a single time series with

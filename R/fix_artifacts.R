@@ -48,13 +48,21 @@ fix_artifacts = function(ts, samp_freq,
                          baseline = NULL,
                          lim = c(-0.5, 0.5),
                          max_gap = 1, ...){
+  # store the number of observations in the time series as 'n'
+  n <- length(ts)
+  # compute thresholds for external interpolations
+  if(is.null(baseline)){
+    baseline <- vector("logical", n)
+    baseline <- !baseline
+  }
+  ts[is.na(ts)] <- 0
+  min_lim <- mean(ts[baseline & ts > 0]) * (1+lim[1])
+  max_lim <- mean(ts[baseline & ts > 0]) * (1+lim[2])
   # if no logical vector of artifacts has been passed, run get_artifacts
   if(is.null(artifacts)){
     artifacts <- get_artifacts(ts, samp_freq, baseline, lim,
                                max_gap = max_gap, ...)
   }
-  # store the number of observations in the time series as 'n'
-  n <- length(ts)
   # calculate the run-lengths of consecutive artifact vs. artifact-free periods
   # across the whole time series
   runs <- rle(artifacts)
@@ -74,13 +82,6 @@ fix_artifacts = function(ts, samp_freq,
   will_break_zoo <- length(runs$values) == 3 && all(runs$values == c(T, F, T))
   # linear interpolation for internal artifacts
   if(!will_break_zoo) ts <- zoo::na.approx(ts, na.rm = F)
-  # compute thresholds for external interpolations
-  if(is.null(baseline)){
-    baseline <- vector("logical", length(ts))
-    baseline <- !baseline
-  }
-  min_lim <- mean(ts[baseline],na.rm=T) * (1+lim[1])
-  max_lim <- mean(ts[baseline],na.rm=T) * (1+lim[2])
   # if there is missing data at end of trial
   if(is.na(ts[n])){
     # h = the length of the final gap in the trial

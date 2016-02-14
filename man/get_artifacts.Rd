@@ -61,7 +61,7 @@ Like other algorithms, this one relies primarily on abrupt jumps in signal to
 identify the onset and offset of blinks. Unlike other algorithms, it does not
 require the user to prespecify threshold values that define onsets and
 offsets for all time series; rather, it adaptively determines the best values
-based on the distribution of the first-order, lag-one differences of each
+based on the distribution of the first-order differences (velocities) of each
 time series. This procedure was designed to mimic the relativistic way a
 human observer would visually identify an artifact, i.e., by assessing the
 pattern of deviation for the candidate artifact relative to that of its
@@ -72,8 +72,8 @@ approach by assigning static thresholds via optional parameters.
 
 This algorithm is intended for the detection of artifacts in relatively short
 time series corresponding to pupil-dilation measurements. It has only been
-tested and validated on 8-second trials sampled at 60 Hz, i.e., time series
-with 480 observations. Good artifact detection may or may not generalize to
-other sampling rates, trial lengths, and types of data.
+tested and validated on 8-second trials sampled at 60 Hz or 500 Hz. Good
+artifact detection may or may not generalize to other sampling rates, trial
+lengths, and types of data.
 }
 

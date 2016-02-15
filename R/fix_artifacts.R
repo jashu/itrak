@@ -15,15 +15,12 @@
 #'
 #' @param samp_freq The sampling frequency in Hz.
 #'
-#' @param max_gap The maximum missing time interval in seconds to fill. The
-#' default setting is 1 sec.
-#'
 #' @param artifacts A logical vector of equal length to the time series that
 #' provides logical indexing into which entries of the time series correspond
-#' to artifacts. If this vector is not specified, it will be generated using
-#' the \code{\link{get_artifacts}} function.
+#' to artifacts.
 #'
-#' @param ... Additional arguments to be passed to \code{\link{get_artifacts}}
+#' @param max_gap The maximum missing time interval in seconds to fill. The
+#' default setting is 1 sec.
 #'
 #' @return A copy of the time series with artifacts and missing data replaced
 #' by interpolated values.
@@ -32,14 +29,9 @@
 #'
 #' @export
 
-fix_artifacts = function(ts, samp_freq, max_gap = 1, artifacts = NULL, ...){
+fix_artifacts = function(ts, samp_freq, artifacts, max_gap = 1){
   # store the number of observations in the time series as 'n'
   n <- length(ts)
-  # if no logical vector of artifacts has been passed, run get_artifacts
-  if(is.null(artifacts)){
-    artifacts <- get_artifacts(ts, samp_freq, baseline, lim,
-                               max_gap = max_gap, ...)
-  }
   # calculate the run-lengths of consecutive artifact vs. artifact-free periods
   # across the whole time series
   runs <- rle(artifacts)

@@ -15,24 +15,13 @@
 #'
 #' @param samp_freq The sampling frequency in Hz.
 #'
+#' @param max_gap The maximum missing time interval in seconds to fill. The
+#' default setting is 1 sec.
+#'
 #' @param artifacts A logical vector of equal length to the time series that
 #' provides logical indexing into which entries of the time series correspond
 #' to artifacts. If this vector is not specified, it will be generated using
 #' the \code{\link{get_artifacts}} function.
-#'
-#' @param baseline Logical vector indicating which parts of the time series
-#' correspond to the baseline period. This is used as a reference for
-#' thresholding the interpolations to the limits of relative change set in the
-#' \code{lim} argument. If there is no baseline, the mean of the entire series
-#' (excluding signal loss) will be used for this reference.
-#'
-#' @param lim Vector of limits specifying minimum and maximum relative change
-#' from baseline that is plausible for your experiment. Default is
-#' \code{c(-.5,.5)}, meaning inteprolations will be constrained to fall within
-#' a 50\% decrease or 50\% increase from \code{baseline}.
-#'
-#' @param max_gap The maximum missing time interval in seconds to fill. Any
-#' longer gaps will be left unchanged. The default setting is 1 sec.
 #'
 #' @param ... Additional arguments to be passed to \code{\link{get_artifacts}}
 #'
@@ -43,21 +32,9 @@
 #'
 #' @export
 
-fix_artifacts = function(ts, samp_freq,
-                         artifacts = NULL,
-                         baseline = NULL,
-                         lim = c(-0.5, 0.5),
-                         max_gap = 1, ...){
+fix_artifacts = function(ts, samp_freq, max_gap = 1, artifacts = NULL, ...){
   # store the number of observations in the time series as 'n'
   n <- length(ts)
-  # compute thresholds for external interpolations
-  if(is.null(baseline)){
-    baseline <- vector("logical", n)
-    baseline <- !baseline
-  }
-  ts[is.na(ts)] <- 0
-  min_lim <- mean(ts[baseline & ts > 0]) * (1+lim[1])
-  max_lim <- mean(ts[baseline & ts > 0]) * (1+lim[2])
   # if no logical vector of artifacts has been passed, run get_artifacts
   if(is.null(artifacts)){
     artifacts <- get_artifacts(ts, samp_freq, baseline, lim,
@@ -101,9 +78,6 @@ fix_artifacts = function(ts, samp_freq,
     # and repeat these difference over the missing interval
     for(i in 1:h){
       ts[n-h+i] <- ts[n-h+i-1] + lag1[i]
-      # thresholded to these limits:
-      if(ts[n-h+i] < min_lim) ts[n-h+i] <- min_lim
-      if(ts[n-h+i] > max_lim) ts[n-h+i] <- max_lim
     }
   }
   # if there is missing data at start of trial
@@ -113,9 +87,9 @@ fix_artifacts = function(ts, samp_freq,
     # [h+1 : 2h+1] = the interval immediately following the first gap that is
     # equal in length to the first gap plus 1
     matched_interval = ts[(h+1):(2*h+1)]
-    # if the length of the initial gap is more than half the length of the entire
-    # time series, or if there are any missing values in the matched interval,
-    # cancel the interpolation.
+    # if the length of the initial gap is more than half the length of the
+    # entire time series, or if there are any missing values in the matched
+    # interval, cancel the interpolation.
     if(h > n/2 || any(is.na(matched_interval))){
       ts <- rep(NA_real_, n)
       return(ts)
@@ -125,9 +99,6 @@ fix_artifacts = function(ts, samp_freq,
     # and repeat these difference over the missing interval
     for(i in h:1){
       ts[i] <- ts[i+1] - lag1[i]
-      # thresholded to these limits:
-      if(ts[i] < min_lim) ts[i] <- min_lim
-      if(ts[i] > max_lim) ts[i] <- max_lim
     }
   }
   return(ts)

@@ -8,8 +8,8 @@ get_artifacts(ts, samp_freq, baseline = NULL, lim = c(-0.5, 0.5),
   max_loss = 0.5, max_gap = 1, min_cont = 0.1, max_velocity = NULL)
 }
 \arguments{
-\item{ts}{A time series, passed as a vector of chronologically ordered
-observations separated by equal intervals of time.}
+\item{ts}{A time series, passed as a numeric vector of chronologically
+ordered, positively valued observations separated by equal intervals of time.}
 
 \item{samp_freq}{Sampling frequency in Hz.}
 

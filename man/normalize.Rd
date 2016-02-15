@@ -22,8 +22,8 @@ to the \code{threshold} parameter.}
 \item{threshold}{Logical value indicating whether or not thresholding to the
 range specified in \code{lim} should be performed. If set to \code{FALSE}
 (the default), time series that exceed \code{lim} will be rejected and a
-veector of all \code{NA}s will be returned. If set to \code{TRUE},
-the lower and upper \code{lim} will be used to impose afloor and ceiling,
+vector of all \code{NA}s will be returned. If set to \code{TRUE},
+the lower and upper \code{lim} will be used to impose a floor and ceiling,
 respectively, on the normalization.}
 }
 \value{

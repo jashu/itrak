@@ -2,9 +2,9 @@
 % Please edit documentation in R/plot_artifacts.R
 \name{plot_artifacts}
 \alias{plot_artifacts}
-\title{Plot artifacts}
+\title{Plot Artifacts}
 \usage{
-plot_artifacts(data, time, pupil, artifacts, trial = NULL)
+plot_artifacts(data, time, measure, artifacts, trial = NULL)
 }
 \arguments{
 \item{data}{Data frame containing time series.}
@@ -12,23 +12,23 @@ plot_artifacts(data, time, pupil, artifacts, trial = NULL)
 \item{time}{Name of variable that gives time units. Will be plotted on the x-
 axis.}
 
-\item{pupil}{Name of variable containing the time series of pupil measures.
+\item{measure}{Name of variable containing the time series of measures.
 Will be plotted on the y-axis.}
 
 \item{artifacts}{Name of variable containing logical vector that indexes
-which observations in the \code{pupil} time series are artifacts.
+which observations in the \code{measure} time series are artifacts.
 See \code{\link{get_artifacts}}.}
 
 \item{trial}{If the data contains multiple time series, name of the variable
 that identifies each time series. Will be plotted using \code{facet_wrap}.}
 }
 \description{
-\code{plot_artifacts} returns a plot of a single time series with
+\code{plot_artifacts} returns a plot of time series with
 artifact intervals marked in red with vertical dotted lines.
 }
 \details{
 Use this plotting function to evaluate the performance of the
-\code{\link{get_artifacts}} function on individual time series and the
+\code{\link{get_artifacts}} function on one or more time series and the
 impact of changes to its threshold settings. If many artifacts are
 going undetected, try decreasing the \code{max_velocity} setting. If there
 are too many false positives, try increaasing it.

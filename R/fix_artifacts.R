@@ -10,8 +10,8 @@
 #' function will silently return a time series consisting of all missing values
 #' so that the user can easily identify which trials need to be dropped.
 #'
-#' @param ts A time series, passed as a vector of chronologically ordered
-#' observations separated by equal intervals of time.
+#' @param ts A time series, passed as a numeric vector of chronologically
+#' ordered, positively valued observations separated by equal intervals of time.
 #'
 #' @param samp_freq The sampling frequency in Hz.
 #'

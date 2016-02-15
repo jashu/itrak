@@ -25,8 +25,8 @@
 #' artifact detection may or may not generalize to other sampling rates, trial
 #' lengths, and types of data.
 #'
-#' @param ts A time series, passed as a vector of chronologically ordered
-#' observations separated by equal intervals of time.
+#' @param ts A time series, passed as a numeric vector of chronologically
+#' ordered, positively valued observations separated by equal intervals of time.
 #'
 #' @param samp_freq Sampling frequency in Hz.
 #'

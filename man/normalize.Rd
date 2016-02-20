@@ -29,4 +29,7 @@ Interpolation of missing values should be done prior to running this
 function. Time series with any \code{NA}s will be silently rejected by
 returning a vector consisting entirely of \code{NA}s.
 }
+\seealso{
+\code{\link{artifacts}}, \code{\link{low_pass_filter}}
+}
 

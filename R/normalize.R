@@ -10,6 +10,8 @@
 #' function. Time series with any \code{NA}s will be silently rejected by
 #' returning a vector consisting entirely of \code{NA}s.
 #'
+#' @seealso  \code{\link{artifacts}}, \code{\link{low_pass_filter}}
+#'
 #' @param ts A time series, passed as a vector of chronologically ordered
 #' observations separated by equal intervals of time.
 #'

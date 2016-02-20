@@ -159,4 +159,8 @@ lengths, and types of data. Please use \code{\link{plot_artifacts}} to
 inspect the performance of \code{get_artifacts} before continuing with
 \code{fix_artifacts} and any subsequent data cleaning and analysis.
 }
+\seealso{
+\code{\link{plot_artifacts}},  \code{\link{plot_comparison}},
+ \code{\link{normalize}},  \code{\link{low_pass_filter}}
+}
 

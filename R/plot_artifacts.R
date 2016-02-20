@@ -9,6 +9,11 @@
 #' going undetected, try decreasing the \code{max_velocity} setting. If there
 #' are too many false positives, try increaasing it.
 #'
+#' Plotting is performed using \code{\link[ggplot2]{ggplot}} and you can modify
+#' the aesthetics of the plot by appending layers using the \code{+} operator.
+#'
+#' @seealso  \code{\link{get_artifacts}}, \code{\link[ggplot2]{ggplot}}
+#'
 #' @param data Data frame containing time series.
 #'
 #' @param time Name of variable that gives time units. Will be plotted on the x-

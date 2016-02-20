@@ -32,5 +32,11 @@ Use this plotting function to evaluate the performance of the
 impact of changes to its threshold settings. If many artifacts are
 going undetected, try decreasing the \code{max_velocity} setting. If there
 are too many false positives, try increaasing it.
+
+Plotting is performed using \code{\link[ggplot2]{ggplot}} and you can modify
+the aesthetics of the plot by appending layers using the \code{+} operator.
+}
+\seealso{
+\code{\link{get_artifacts}}, \code{\link[ggplot2]{ggplot}}
 }
 

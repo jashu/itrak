@@ -2,9 +2,9 @@
 % Please edit documentation in R/normalize.R
 \name{normalize}
 \alias{normalize}
-\title{Baseline normalization}
+\title{Normalize Time Series}
 \usage{
-normalize(ts, baseline, lim = c(-0.5, 0.5), threshold = FALSE)
+normalize(ts, baseline)
 }
 \arguments{
 \item{ts}{A time series, passed as a vector of chronologically ordered
@@ -12,35 +12,21 @@ observations separated by equal intervals of time.}
 
 \item{baseline}{A logical vector indicating which elements of the time
 series correspond to the baseline period.}
-
-\item{lim}{Vector of limits specifying minimum and maximum relative change
-from baseline that is plausible for your experiment. Default is
-\code{c(-.5,.5)}, meaning time series containing more than a 50\% decrease or
-50\% increase from baseline will either be rejected or thresholded, according
-to the \code{threshold} parameter.}
-
-\item{threshold}{Logical value indicating whether or not thresholding to the
-range specified in \code{lim} should be performed. If set to \code{FALSE}
-(the default), time series that exceed \code{lim} will be rejected and a
-vector of all \code{NA}s will be returned. If set to \code{TRUE},
-the lower and upper \code{lim} will be used to impose a floor and ceiling,
-respectively, on the normalization.}
 }
 \value{
-A baseline-normalized copy of the time series.
+A baseline-normalized copy of the time series converted to units of
+relative change (difference from baseline as a fraction of baseline).
 }
 \description{
 \code{normalize} normalizes the time series to a specified baseline
-reference period.
-}
-\details{
-\eqn{(ts-baseline)/baseline} where \eqn{ts} is the time series and
-\eqn{baseline} is the mean of the values belonging to the baseline period.
+reference period using \eqn{(ts-baseline)/baseline} where \eqn{ts} is the
+time series and \eqn{baseline} is the mean of the values belonging to the
+baseline period.
 }
 \section{Warning}{
 
 Interpolation of missing values should be done prior to running this
-function. Time series with any \code{NA}s will be silently rejected, and a
-vector consisting entirely of \code{NA}s will be returned.
+function. Time series with any \code{NA}s will be silently rejected by
+returning a vector consisting entirely of \code{NA}s.
 }
 

@@ -1,4 +1,4 @@
-#' Low pass filter
+#' Low-Pass Filter
 #'
 #' \code{low_pass_filter} implements a low-pass third-order Butterworth filter.
 #'
@@ -8,22 +8,15 @@
 #' original sampling frequency in Hz and the desired filter in Hz, without
 #' having to specify the filter in terms of a fraction of the Nyquist filter.
 #'
-#' This function also simplifies the output of the call to \code{\link[signal]{filter}} by
-#' converting it into a numerical vector, which can then be used to replace
-#' the original time series in a data frame.
+#' This function also simplifies the output of the call to
+#' \code{\link[signal]{filter}} by converting it into a numerical vector,
+#' which can then be used to replace the original time series in a data frame.
 #'
-#' @section Handling of Missing Values:
-#' This function prevents \code{NA} values from being passed to
-#' \code{\link[signal]{filter}}, which would result in an error. Instead, if
-#' this function encounter a time series with any NAs, it will return a time
-#' series consisting entirely of NAs. Interpolation of missing values must
-#' be done prior to running this function.
+#' @section Note:
+#' The low-pass filter assumes that the signal should start from 0, and it will
+#' always return a time series that starts from 0.
 #'
-#' @section Warning:
-#' The low-pass filter assumes that the signal starts from 0, and it will always
-#' return a time series that starts from 0. DO NOT run this function without
-#' first normalizing the signal to its baseline, e.g., with function
-#' \code{\link{normalize}}.
+#' @seealso \code{\link{artifacts}}, \code{\link{normalize}}
 #'
 #' @param ts A time series, passed as a vector of chronologically ordered
 #' observations separated by equal intervals of time.
@@ -39,9 +32,14 @@
 #'
 low_pass_filter <- function(ts, samp_freq, filter_freq = 4){
   if(any(is.na(ts))){
-    ts[1:length(ts)] <- NA
-    return(ts)
+    stop(paste("Interpolation of missing values must be done prior to running",
+               "this function. See ?artifacts."))
   }
-  LPF <- signal:::butter(3, 2 * filter_freq / samp_freq, "low")
-  return(as.vector(signal:::filter(LPF, ts)))
+  if(abs(ts[1]) > 0.001){
+    stop(paste("Your time series must be scaled to a start value of",
+               "approximately 0 prior to running this function.",
+               "See ?normalize"))
+  }
+  LPF <- signal::butter(3, 2 * filter_freq / samp_freq, "low")
+  return(as.vector(signal::filter(LPF, ts)))
 }

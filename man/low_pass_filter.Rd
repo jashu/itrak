@@ -2,7 +2,7 @@
 % Please edit documentation in R/low_pass_filter.R
 \name{low_pass_filter}
 \alias{low_pass_filter}
-\title{Low pass filter}
+\title{Low-Pass Filter}
 \usage{
 low_pass_filter(ts, samp_freq, filter_freq = 4)
 }
@@ -28,24 +28,16 @@ implementation and allows the user to specify the filter in terms of the
 original sampling frequency in Hz and the desired filter in Hz, without
 having to specify the filter in terms of a fraction of the Nyquist filter.
 
-This function also simplifies the output of the call to \code{\link[signal]{filter}} by
-converting it into a numerical vector, which can then be used to replace
-the original time series in a data frame.
+This function also simplifies the output of the call to
+\code{\link[signal]{filter}} by converting it into a numerical vector,
+which can then be used to replace the original time series in a data frame.
 }
-\section{Handling of Missing Values}{
+\section{Note}{
 
-This function prevents \code{NA} values from being passed to
-\code{\link[signal]{filter}}, which would result in an error. Instead, if
-this function encounter a time series with any NAs, it will return a time
-series consisting entirely of NAs. Interpolation of missing values must
-be done prior to running this function.
+The low-pass filter assumes that the signal should start from 0, and it will
+always return a time series that starts from 0.
 }
-
-\section{Warning}{
-
-The low-pass filter assumes that the signal starts from 0, and it will always
-return a time series that starts from 0. DO NOT run this function without
-first normalizing the signal to its baseline, e.g., with function
-\code{\link{normalize}}.
+\seealso{
+\code{\link{artifacts}}, \code{\link{normalize}}
 }
 

@@ -37,18 +37,19 @@ plot_artifacts <- function(data, time, measure, artifacts, trial = NULL){
   if(is.null(trial)){
     trial <- rep(1, length(time))
   }
+  IQR <- quantile(measure, c(.25, .75), na.rm = TRUE)
+  ymin <- IQR[1] - (1.5 * (IQR[2] - IQR[1]))
+  ymax <- IQR[2] + (1.5 * (IQR[2] - IQR[1]))
   measure_data <- data_frame(time = time,
                            measure = measure,
                            artifacts = artifacts,
                            trial = trial)
   artifacts <- measure_data %>% filter(artifacts)
-  mean_measure <- mean(measure_data$measure, na.rm = T)
-  limits <- c(.5*mean_measure, 1.5*mean_measure)
   ggplot() +
     geom_line(aes(time, measure), measure_data) +
     geom_vline(aes(xintercept = time), artifacts,
                color = "red", linetype = "dotted") +
-    scale_y_continuous(limits = limits) +
+    scale_y_continuous(limits = c(ymin, ymax)) +
     facet_wrap(~trial) +
     ylab("") +
     theme_bw()

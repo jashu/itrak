@@ -50,5 +50,6 @@ plot_artifacts <- function(data, time, measure, artifacts, trial = NULL){
                color = "red", linetype = "dotted") +
     scale_y_continuous(limits = limits) +
     facet_wrap(~trial) +
+    ylab("") +
     theme_bw()
 }

@@ -34,10 +34,10 @@
 plot_artifacts <- function(data, time, measure, artifacts, trial = NULL){
   arguments <- as.list(match.call())
   if(!is.null(data)){
-    time = eval(arguments$time,data)
-    measure = eval(arguments$measure,data)
-    artifacts = eval(arguments$artifacts,data)
-    trial = eval(arguments$trial, data)
+    time <- eval(arguments$time,data)
+    measure <- eval(arguments$measure,data)
+    artifacts <- eval(arguments$artifacts,data)
+    trial <- eval(arguments$trial, data)
   }
   if(is.null(trial)){
     trial <- rep(1, length(time))

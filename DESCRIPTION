@@ -19,7 +19,8 @@ Imports:
     forecast,
     signal,
     ggplot2,
-    dplyr
+    dplyr,
+    lazyeval
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 5.0.1

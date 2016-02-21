@@ -46,12 +46,23 @@
 #' dilation, it can experience at most a 75\% decrease in diameter (95\%
 #' reduction in area). If the pupil starts off at minimum dilation, it can
 #' experience at most a 300\% increase in diameter (1500\% increase in area).
-#' This would correspond to \code{lim = c(-0.75, 3)} for diameter, but you can
-#' and should set your limits to be more conservative if you do not expect your
-#' measurements to span this range. We have found that with psychological
-#' stimuli using our eye-tracking setup, \code{lim = c(-0.5, 0.5)} and
-#' \code{lim = c(-.75, 1.25)} appear to provide liberal coverage for plausible
-#' changes in pupil diameter and area, respectively.
+#' This would correspond to \code{lim = c(-0.75, 3)} for diameter and
+#' \code{lim = c(-0.95, 1500)} for area, but you should set your limits to be
+#' more conservative if you do not expect your measurements to span this range.
+#'
+#' For example, most users will measure pupils under moderate lighting
+#' conditions, so baseline pupil readings will start off closer to the center of
+#' their physiological range. Even assuming maximum decreases and increases from
+#' this point, the range could be narrowed to \code{lim = c(-0.6, 0.6)} for
+#' diameter and \code{lim = c(-0.85, 1.5)} for area. We have found that with
+#' psychological stimuli using our eye-tracking setup, \code{lim = c(-0.5, 0.5)}
+#' and \code{lim = c(-.75, 1.25)} appear to provide liberal coverage for
+#' plausible changes in pupil diameter and area, respectively, and you want your
+#' \code{lim} setting to err on the side of being too wide. The \code{lim}
+#' argument is meant to serve as an "extra layer of security" to catch a
+#' minority of artifacts that slip past the primary detection algorithm. So a
+#' narrower `lim` will generate far more false positives than a wider `lim` will
+#' generate false negatives.
 #'
 #' @section Warning:
 #' If the time series contains gaps that are too long for interpolation (as

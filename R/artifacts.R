@@ -187,8 +187,8 @@ get_artifacts <- function(ts, samp_freq, lim,
   artifact <- vector("logical", length(ts))
   if(is.null(baseline)) baseline <- !artifact
   if(all(ts[baseline] == 0)) return(!artifact)
-  min_lim <- mean(ts[baseline & ts > 0]) * (1+lim[1])
-  max_lim <- mean(ts[baseline & ts > 0]) * (1+lim[2])
+  min_lim <- median(ts[baseline & ts > 0]) * (1+lim[1])
+  max_lim <- median(ts[baseline & ts > 0]) * (1+lim[2])
   cleaner_ts <- ts[ts > 0]
   if(is.null(max_velocity)){
     lag <- floor(samp_freq/50)

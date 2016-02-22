@@ -130,11 +130,11 @@
 #' @param threshold Logical value indicating whether or not thresholding to the
 #' range specified in \code{lim} should be performed when extrapolating the
 #' beginning and ending of a time series (if the time series begins or ends with
-#' an artifact). If set to \code{FALSE} (the default), extrapolations that
-#' exceed \code{lim} will cause the entire time series to be rejected and a
-#' vector of all \code{NA}s to be returned. If set to \code{TRUE}, the lower
-#' and upper \code{lim} will be used to impose a floor and ceiling,
-#' respectively, on extrapolation.
+#' an artifact). If set to \code{FALSE}, extrapolations that exceed \code{lim}
+#' will cause the entire time series to be rejected and a vector of all
+#' \code{NA}s to be returned. If set to \code{TRUE}, the lower and upper
+#' \code{lim} will be used to impose a floor and ceiling, respectively, on
+#' extrapolation.
 #'
 #' @param artifacts A logical vector of equal length to the time series that
 #' provides logical indexing into which entries of the time series correspond
@@ -190,11 +190,13 @@ get_artifacts <- function(ts, samp_freq, lim,
     return(artifacts)
   }
   #=============================================================================
-  # check that time series does not have negative values------------------------
+  # check that time series does not have negative values
+  #-----------------------------------------------------------------------------
   ts[is.na(ts)] <- 0
   if(any(ts < 0)) stop("Time series has negative values.")
   #=============================================================================
-  # initialize variables--------------------------------------------------------
+  # initialize variables
+  #-----------------------------------------------------------------------------
   artifact <- vector("logical", length(ts))
   if(is.null(baseline)) baseline <- !artifact
   if(all(ts[baseline] == 0)) return(!artifact)
@@ -261,12 +263,14 @@ get_artifacts <- function(ts, samp_freq, lim,
       }
       i <- ifelse(forward,i+1,i-1)
     }
+    artifact <- artifact | !dplyr::between(ts, min_lim, max_lim)
     return(artifact)
   }
   # =====================================================================
   artifact <- is_artifact(forward = TRUE) | is_artifact(forward = FALSE)
   return(merge_artifacts(artifact))
 }
+
 
 #' @export
 #' @rdname artifacts
@@ -275,7 +279,7 @@ fix_artifacts = function(ts, samp_freq, lim,
                          max_loss = 0.5,
                          max_gap = 1,
                          ...,
-                         threshold = FALSE,
+                         threshold = TRUE,
                          artifacts = NULL){
   # store the number of observations in the time series as 'n'
   n <- length(ts)
@@ -285,8 +289,8 @@ fix_artifacts = function(ts, samp_freq, lim,
     baseline <- !baseline
   }
   ts[is.na(ts)] <- 0
-  min_lim <- mean(ts[baseline & ts > 0]) * (1+lim[1])
-  max_lim <- mean(ts[baseline & ts > 0]) * (1+lim[2])
+  min_lim <- median(ts[baseline & ts > 0]) * (1+lim[1])
+  max_lim <- median(ts[baseline & ts > 0]) * (1+lim[2])
   # if no logical vector of artifacts has been passed, run get_artifacts
   if(is.null(artifacts)){
     artifacts <- get_artifacts(ts, samp_freq, baseline, lim,

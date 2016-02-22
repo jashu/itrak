@@ -10,7 +10,7 @@ get_artifacts(ts, samp_freq, lim, baseline = NULL, max_loss = 0.5,
   max_gap = 1, min_cont = 0.1, max_velocity = NULL)
 
 fix_artifacts(ts, samp_freq, lim, baseline = NULL, max_loss = 0.5,
-  max_gap = 1, ..., threshold = FALSE, artifacts = NULL)
+  max_gap = 1, ..., threshold = TRUE, artifacts = NULL)
 }
 \arguments{
 \item{ts}{A time series, passed as a numeric vector of chronologically
@@ -62,11 +62,11 @@ given the \code{samp_freq}) pooled across the entire time series.}
 \item{threshold}{Logical value indicating whether or not thresholding to the
 range specified in \code{lim} should be performed when extrapolating the
 beginning and ending of a time series (if the time series begins or ends with
-an artifact). If set to \code{FALSE} (the default), extrapolations that
-exceed \code{lim} will cause the entire time series to be rejected and a
-vector of all \code{NA}s to be returned. If set to \code{TRUE}, the lower
-and upper \code{lim} will be used to impose a floor and ceiling,
-respectively, on extrapolation.}
+an artifact). If set to \code{FALSE}, extrapolations that exceed \code{lim}
+will cause the entire time series to be rejected and a vector of all
+\code{NA}s to be returned. If set to \code{TRUE}, the lower and upper
+\code{lim} will be used to impose a floor and ceiling, respectively, on
+extrapolation.}
 
 \item{artifacts}{A logical vector of equal length to the time series that
 provides logical indexing into which entries of the time series correspond

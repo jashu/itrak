@@ -31,11 +31,12 @@
 #' @export
 #'
 low_pass_filter <- function(ts, samp_freq, filter_freq = 4){
+  if(all(is.na(ts))) return(ts)
   if(any(is.na(ts))){
     stop(paste("Interpolation of missing values must be done prior to running",
                "this function. See ?artifacts."))
   }
-  if(abs(ts[1]) > 0.001){
+  if(abs(ts[1]) > 0.1){
     stop(paste("Your time series must be scaled to a start value of",
                "approximately 0 prior to running this function.",
                "See ?normalize"))

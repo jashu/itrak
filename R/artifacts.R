@@ -31,7 +31,7 @@
 #' equipment. \code{get_artifacts} uses the \code{lim} argument to catch periods
 #' of sustained signal loss or signal drift that would not be caught by looking
 #' at velocity alone, e.g., if the signal slowly (rather than abruptly) veers
-#' into a range that is implausible given its starting point.
+#' into a range that is implausible given its starting point, and
 #' \code{fix_artifacts} uses the \code{lim} argument to constrain extrapolations
 #' at the beginning and end of trials. Depending on the \code{threshold}
 #' argument, \code{fix_artifacts} imposes a floor or ceiling to the
@@ -68,7 +68,7 @@
 #' If the time series contains gaps that are too long for interpolation (as
 #' defined in the \code{max_gap} argument) or if the extrapolated portion of
 #' the time series exceeds the range specified in the \code{lim} argument and
-#' \code{threshold} is set to \code{FALSE} (the default), \code{fix_artifacts}
+#' \code{threshold} is set to \code{FALSE}, \code{fix_artifacts}
 #' will silently return a time series consisting of all missing values so that
 #' the user can easily identify which trials need to be dropped.
 #'

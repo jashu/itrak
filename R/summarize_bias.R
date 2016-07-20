@@ -61,10 +61,10 @@
 #' ordering, it is recommended that prior to calling this function you sort your
 #' data using \code{\link[dplyr]{arrange}(data, g1, ..., trial)} where \code{g1}
 #' is your primary grouping variable (most likely `subject` or `id`) followed by
-#' any secondary grouping variables (e.g., 'session', 'category') and ending with
-#' the variable that gives the \code{trial} number. This should then be piped to
-#' \code{\link[dplyr]{group_by}(g1, ...)}, where \code{g1, ...} corresponds
-#' precisely to the same grouping variables used in the call to
+#' any secondary grouping variables (e.g., 'session', 'category') and ending
+#' with the variable that gives the \code{trial} number. This should then be
+#' piped to \code{\link[dplyr]{group_by}(g1, ...)}, where \code{g1, ...}
+#' corresponds precisely to the same grouping variables used in the call to
 #' \code{\link[dplyr]{arrange}}. (Do NOT include \code{trial} in the call to
 #' \code{\link[dplyr]{group_by}}.) The result is then ready to be piped to the
 #' \code{summarize_bias} function.
@@ -74,19 +74,20 @@
 #'
 #' @param data A data frame or table.
 #'
-#' @param measure The name of the column in \code{data} that contains
+#' @param RT The name of the column in \code{data} that contains
 #' chronologically ordered observations of numeric type.
 #'
-#' @param trial_type The name of the column in \code{data} that provides the
-#'  trial type of the corresponding row of \code{measure}. \code{trial_type}
-#'  must be a dichotomous factor (having exactly 2 levels) or convertible to
-#'  such.
+#' @param congruent The name of the column in \code{data} that contains logical
+#'  indicators of whether the corresponding entry of \code{RT} is a congruent
+#'  \code{TRUE} or incongruent \code{FALSE} trial.
 #'
-#' @param reference Value indicating which level of trial \code{type} should
-#'  come first when subtracting trials of opposite type to generate a bias
-#'  score: \eqn{bias = reference type - opposite type}. If \code{type} is of
-#'  class \code{factor}, defaults to the first factor level; otherwise defaults
-#'  to the trial type that comes first alphanumerically.
+#' @param weighted A logical value. If \code{TRUE} (the default), each congruent
+#'  trial is subtracted from the weighted mean of \emph{both} the preceding
+#'  \emph{and} subsequent incongruent trials (with the closer of the two trials
+#'  receiving the stronger weight). If \code{FALSE}, the method described by
+#'  Zvielli et al. (2015) is implemented, and each congruent trial is subtracted
+#'  from the single nearest incongruent trial (\emph{either} the preceding
+#'  \emph{or} subsequent trial). See \code{\link{get_tlbs}} for details.
 #'
 #' @param search_limit When calculating trial-level bias, how many trials to
 #'  look forward or backward to find a trial of opposite type. Default value is
@@ -124,32 +125,30 @@
 #' # Create example data frame containing 10 time series of 10 reaction times
 #' # and trial types of congruent ('con') vs. incongruent ('incon'):
 #' data <- data.frame(id = rep(1:10, each = 10),
-#'                    rt = sample(500:5000, 100),
-#'                    type = sample(c("con","incon"), 100, replace = TRUE),
+#'                    rt = sample(100:1000, 10),
+#'                    congru = sample(c(TRUE,FALSE), 100, replace = TRUE),
 #'                    trial = rep(1:10, 10))
 #'
-#' # Use dplyr to sort by trial and group by id and then generate bias summary
-#' # specifying that congruent trials should be subtracted from incongruent by
-#' # setting reference to "incon":
+#' # Use dplyr to sort by trial and group by id and then generate bias summary:
 #' data %>%
 #' arrange(id, trial) %>%
 #' group_by(id) %>%
-#' summarize_bias(measure = rt, trial_type = type, reference = 'incon')
+#' summarize_bias(RT = rt, congruent = congru)
 #'
 #' @seealso \code{\link{get_bs}}, \code{\link{get_tlbs}},
 #' \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{summarize}}
 #'
 #' @export
 
-summarize_bias <- function(data, measure, trial_type, reference = NULL,
+summarize_bias <- function(data, RT, congruent, weighted = TRUE,
                            search_limit = 5){
   a <- as.list(match.call())
-  data$measure <- eval(a$measure, data)
-  data$trial_type <- eval(a$trial_type, data)
-  data <- dplyr::mutate(data, tlbs = get_tlbs(measure, trial_type, reference,
-                                               search_limit))
+  data$RT <- eval(a$RT, data)
+  data$congruent <- eval(a$congruent, data)
+  data <- dplyr::mutate(data,
+                        tlbs = get_tlbs(RT, congruent, weighted, search_limit))
   dplyr::summarize(data,
-                   mean_bias = get_bs(measure, trial_type, reference),
+                   mean_bias = get_bs(RT, congruent),
                    mean_toward = mean(tlbs[tlbs > 0], na.rm = T),
                    mean_away = -1 * mean(tlbs[tlbs < 0], na.rm = T),
                    peak_toward = max(tlbs, na.rm = T),

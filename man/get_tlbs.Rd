@@ -57,19 +57,19 @@ real IT.
 
 The two methods yield highly similar TL-BS numbers, but the weighted method
 may be preferable for two reasons: 1) In the event that a trial of one type
-is equidistant from two trials of opposite type, the Zvielli method
+is equidistant from two trials of opposite type, the nearest-trial method
 arbitrarily chooses one over the other; under this circumstance, the mean of
-the two trials may be a more valid point of comparison. 2) The Zvielli
+the two trials may be a more valid point of comparison. 2) The nearest-trial
 method frequently double-counts the same IT-CT subtraction. For example,
-consider the sequence IT IT CT CT: under the Zvielli method, the interior IT-
-CT pair will result in duplicate TL-BS calculations for these two trials.
-This double counting results in brief but frequent artifactual periods where
-the TL-BS time series is completely flat. (See examples below.) Under the
-weighted method, these calculations will be non-identical because a trial is
-not subtracted directly from another single trial, but rather from the
-weighted means of unique trial pairs. In the above example, the interior CT
-would not be subtracted from the preceding IT, but rather the weighted
-average of the preceding IT and whatever IT comes next.
+consider the sequence IT IT CT CT: under the nearest-trial method, the
+interior IT-CT pair will result in duplicate TL-BS calculations for these two
+trials. This double counting results in brief but frequent artifactual
+periods where the TL-BS time series is completely flat. (See examples below.)
+Under the weighted method, these calculations will be non-identical because a
+trial is not subtracted directly from another single trial, but rather from
+the weighted means of unique trial pairs. In the above example, the interior
+CT would not be subtracted from the preceding IT, but rather from the
+weighted average of the preceding IT and whatever IT comes next.
 }
 \examples{
 # Create example time series of 50 reaction times in ms:

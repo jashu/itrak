@@ -7,7 +7,7 @@
 \title{Time Series Artifact Detection and Correction}
 \usage{
 get_artifacts(ts, samp_freq, lim, baseline = NULL, max_loss = 0.5,
-  max_gap = 1, min_cont = 0.1, max_velocity = NULL)
+  max_gap = 1, min_cont = 0.2, max_velocity = NULL)
 
 fix_artifacts(ts, samp_freq, lim, baseline = NULL, max_loss = 0.5,
   max_gap = 1, ..., threshold = TRUE, artifacts = NULL)
@@ -44,8 +44,8 @@ span. Default value is 1 second.}
 
 \item{min_cont}{Minimum continuity in seconds required between artifacts.
 If the period of "good" data between two artifacts is less than this
-threshold, the two artifacts are merged into one. Default value is 0.1
-(100 ms).}
+threshold, the two artifacts are merged into one. Default value is 0.2
+(200 ms).}
 
 \item{max_velocity}{The maximum plausible change (in measurement units)
 that can occur from one reading to the next. Differences between consecutive

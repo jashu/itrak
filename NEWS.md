@@ -1,3 +1,26 @@
+# itrak 0.0.0.9110
+
+This update reflects a minor change to the artifact detection defaults and a
+major revision to the `get_tlbs` function.
+
+## New default `lim` argument
+
+Based on user feedback, the default setting for the `min_cont` argument in `get_artifacts` has been changed from 100 ms to 200 ms. This appears to give better artifact identification over a wider range of cases without introducing false positives in pupil diameter time series. But as always you should scrutinize artifact-identification plots and adjust default parameters if that is appropriate for your data.
+
+## Revisions to `get_tlbs`, `get_bs`, and `summarize_bias` functions
+
+1. `get_tlbs` now includes a new method I developed for calculating trial-level bias scores (TL-BS). The old method used by Zvielli et al. (2015) is still available by setting the new parameter `weighted` to `FALSE`. For the first and last 2 pairs of an incongruent trial (IT) and congruent trial (CT), the methods are equivalent, but for all trials in between the weighted method calculates the mean of the preceding and subsequent trials of opposite type, with the closer trial weighted more heavily than the more distant trial. This is computed by constructing a CT times series with missing values in place of ITs (and vice versa), performing a linear interpolation over the missing values, and then subtracting the approximated complete CT times series from the approximated complete IT time series. Thus, each real CT is subtracted from a projected IT that lies on an imaginary line connecting the two surrounding real ITs, and a similarly projected CT is subtracted from each real IT. 
+
+    The two methods yield highly similar TL-BS numbers, but the weighted method may be preferable for two reasons: 1) In the event that a trial of one type is equidistant from two trials of opposite type, the Zvielli method arbitrarily chooses one over the other; under this circumstance, the mean of the two trials may be a more valid point of comparison. 2) The Zvielli method frequently double-counts the same IT-CT subtraction. For example, consider the sequence IT IT CT CT: under the Zvielli method, the interior IT- CT pair will result in duplicate TL-BS calculations for these two trials. This double counting results in brief but frequent artifactual periods where the TL-BS time series is completely flat. (See examples in the help file.) Under the weighted method, these calculations will be non-identical because a trial is not subtracted directly from another single trial, but rather from the weighted means of unique trial pairs. In the above example, the interior CT would not be subtracted from the preceding IT, but rather the weighted average of the preceding IT and whatever IT comes next.
+
+2. Arguments for all of the attention-bias functions have been renamed and simplified as follows: 
+    a. The `measure` argument has been renamed to `RT` to make it more obvious which argument corresponds to reaction times. Functionally, however, it works just the same.
+    b. The `type` and `reference` arguments have been replaced by a single `congruent` argument, which should be a logical vector indicating whether a given trial is congruent (`TRUE`) or incongruent (`FALSE`). This is hopefully easier to use and less confusing, and makes the function code much easier to read for anyone wishing to understand how the function works.   
+    c. There is a new `weighted` argument that controls whether the nearest-trial method of Zvielli et al. will be used (`weighted = FALSE`) vs. the weighted-trials method discussed above (`weighted = TRUE`). By default, the function will use the new weighted method.
+    d. The `search_limit` argument remains unchanged.
+ 
+**IMPORTANT:** Note that if you have previously written code with any of the above functions, this update will break them. You will need to create a logical test for congruent trials to pass to the `congruent` parameter, remove any `type` or `reference` arguments, and optionally add a `weighted = FALSE` argument if you wish to keep using the original Zvielli et al. method.
+
 # itrak 0.0.0.9100
 
 This update reflects a major overhaul of the software architecture of the pupillometry functions to improve usability and performance, and adds several new features to help prepare your data for artifact cleaning:

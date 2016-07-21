@@ -47,9 +47,9 @@ method. For the first and last 2 IT-CT pairs, the methods are equivalent, but
 for all trials in between the weighted method calculates the mean of the
 preceding and subsequent trials of opposite type, with the closer trial
 weighted more heavily than the more distant trial. This is computed by
-constructing a CT times series with missing values in place of ITs (and vice
+constructing a CT time series with missing values in place of ITs (and vice
 versa), performing a linear interpolation over the missing values, and then
-subtracting the approximated complete CT times series from the approximated
+subtracting the approximated complete CT time series from the approximated
 complete IT time series. Thus, each real CT is subtracted from a
 \emph{projected} IT that lies on an imaginary line connecting the two
 surrounding real ITs, and a similarly projected CT is subtracted from each
@@ -67,7 +67,7 @@ trials. This double counting results in brief but frequent artifactual
 periods where the TL-BS time series is completely flat. (See examples below.)
 Under the weighted method, these calculations will be non-identical because a
 trial is not subtracted directly from another single trial, but rather from
-the weighted means of unique trial pairs. In the above example, the interior
+the weighted mean of unique trial pairs. In the above example, the interior
 CT would not be subtracted from the preceding IT, but rather from the
 weighted average of the preceding IT and whatever IT comes next.
 }

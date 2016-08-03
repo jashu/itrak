@@ -6,11 +6,10 @@
 \alias{get_artifacts}
 \title{Time Series Artifact Detection and Correction}
 \usage{
-get_artifacts(ts, samp_freq, lim, baseline = NULL, max_loss = 0.5,
-  max_gap = 1, min_cont = 0.2, max_velocity = NULL)
+get_artifacts(ts, samp_freq, min_cont = 0.2)
 
 fix_artifacts(ts, samp_freq, lim, baseline = NULL, max_loss = 0.5,
-  max_gap = 1, ..., threshold = TRUE, artifacts = NULL)
+  max_gap = 1, min_cont = 0.2, artifacts = NULL)
 }
 \arguments{
 \item{ts}{A time series, passed as a numeric vector of chronologically
@@ -18,12 +17,15 @@ ordered, positively valued observations separated by equal intervals of time.}
 
 \item{samp_freq}{Sampling frequency in Hz.}
 
+\item{min_cont}{Minimum continuity in seconds required between artifacts.
+If the period of "good" data between two artifacts is less than this
+threshold, the two artifacts are merged into one. Default value is 0.2
+(200 ms).}
+
 \item{lim}{Two-item numeric vector \code{c(neg, pos)} specifying the negative
 and positive limits, respectively, of relative change from baseline
 that is plausible for your time series. (See section "Advice on setting
-\code{lim} argument" for more information and examples.) Values outside of
-this range will be flagged as artifacts regardless of whether or not they
-deviate markedly from their nearest neighbors.}
+\code{lim} argument" for more information and examples.)}
 
 \item{baseline}{Logical vector indicating which parts of the time series
 correspond to the baseline period. This is used as a reference for
@@ -33,40 +35,15 @@ entire series (excluding signal loss) will be used for this reference.}
 
 \item{max_loss}{Maximum fraction of time series that is allowed to contain
 dropped signal and/or artifacts. Default value is 0.5, meaning if more than
-half of the time series is missing, \code{get_artifacts} will label the
-entire time series as one continuous artifact, and, if more than half of the
-time series consists of artifacts, \code{fix_artifacts} will not perform
-interpolation/extrapolation and instead will return a vector of all
+half of the time series consists of artifacts, \code{fix_artifacts} will not
+perform interpolation/extrapolation and instead will return a vector of all
 \code{NA}s.}
 
 \item{max_gap}{Maximum gap in seconds that an artifact period is allowed to
-span. Default value is 1 second.}
-
-\item{min_cont}{Minimum continuity in seconds required between artifacts.
-If the period of "good" data between two artifacts is less than this
-threshold, the two artifacts are merged into one. Default value is 0.2
-(200 ms).}
-
-\item{max_velocity}{The maximum plausible change (in measurement units)
-that can occur from one reading to the next. Differences between consecutive
-readings that exceed this value are used to identify artifact onsets, and
-differences within this value over the \code{min_cont} time span are used to
-identify artifact offsets. If no value is specified, the function will assign
-this to the 90th percentile of the absolute values of the first-order lag-x
-differences (where x is the number of samples that best approximates 20 ms
-given the \code{samp_freq}) pooled across the entire time series.}
-
-\item{...}{Additional arguments to be passed to \code{get_artifacts} via
-\code{fix_artifacts}}
-
-\item{threshold}{Logical value indicating whether or not thresholding to the
-range specified in \code{lim} should be performed when extrapolating the
-beginning and ending of a time series (if the time series begins or ends with
-an artifact). If set to \code{FALSE}, extrapolations that exceed \code{lim}
-will cause the entire time series to be rejected and a vector of all
-\code{NA}s to be returned. If set to \code{TRUE}, the lower and upper
-\code{lim} will be used to impose a floor and ceiling, respectively, on
-extrapolation.}
+span. Default value is 1 second, meaning if more than half of the time series
+consists of artifacts, \code{fix_artifacts} will not perform
+interpolation/extrapolation and instead will return a vector of all
+\code{NA}s.}
 
 \item{artifacts}{A logical vector of equal length to the time series that
 provides logical indexing into which entries of the time series correspond
@@ -99,9 +76,7 @@ determines the best values based on the distribution of the first-order
 differences (velocities) of each time series. This procedure was designed to
 mimic the relativistic way a human observer would visually identify an
 artifact, i.e., by assessing the pattern of deviation for the candidate
-artifact relative to that of its nearest neighbors. However, this function
-can also accommodate the traditional approach by assigning static thresholds
-via optional parameters.
+artifact relative to that of its nearest neighbors.
 
 Using the output of \code{get_artifacts}, \code{fix_artifacts} repairs
 artifacts using a sequence of linear interpolation for internal artifacts
@@ -111,25 +86,18 @@ series).
 }
 \section{Advice on setting \code{lim} argument}{
 
-You are required to specify a vector of limits that defines what magnitude of
-relative change from baseline is plausible for your experiment and your
-equipment. \code{get_artifacts} uses the \code{lim} argument to catch periods
-of sustained signal loss or signal drift that would not be caught by looking
-at velocity alone, e.g., if the signal slowly (rather than abruptly) veers
-into a range that is implausible given its starting point, and
-\code{fix_artifacts} uses the \code{lim} argument to constrain extrapolations
-at the beginning and end of trials. Depending on the \code{threshold}
-argument, \code{fix_artifacts} imposes a floor or ceiling to the
-extrapolation (when \code{threshold = TRUE}), or rejects the entire time
-series (when \code{threshold = FALSE}).
 
-In setting the \code{lim} argument, think about what sort of relative change
-is plausible for your measurement. For example, if you are measuring pupils,
-the normal pupil size in adults varies from a minimum diameter of about 2 mm
-(3 square mm area) to a maximum diameter of about 8 mm (50 square mm area) in
-bright light vs. darkness. This means if the pupil starts off at maximum
-dilation, it can experience at most a 75\% decrease in diameter (95\%
-reduction in area). If the pupil starts off at minimum dilation, it can
+\code{fix_artifacts} uses the \code{lim} argument to impose a floor and
+ceiling to the values that the time series is allowed to take. Values that
+exceed this range are then treated like any other artifact. The purpose of
+the \code{lim} argument is to catch time series that contain "slow drift",
+meaning the signal gradually drifts into implausible values. In setting the
+\code{lim} argument, think about what sort of relative change is plausible
+for your measurement. For example, if you are measuring pupils, the normal
+pupil size in adults varies from a minimum diameter of about 2 mm (3 square
+mm area) to a maximum diameter of about 8 mm (50 square mm area) in bright
+light vs. darkness. This means if the pupil starts off at maximum dilation,
+it can experience at most a 75\% decrease in diameter (95\% reduction in area). If the pupil starts off at minimum dilation, it can
 experience at most a 300\% increase in diameter (1500\% increase in area).
 This would correspond to \code{lim = c(-0.75, 3)} for diameter and
 \code{lim = c(-0.95, 1500)} for area, but you should set your limits to be
@@ -143,21 +111,17 @@ diameter and \code{lim = c(-0.85, 1.5)} for area. We have found that with
 psychological stimuli using our eye-tracking setup, \code{lim = c(-0.5, 0.5)}
 and \code{lim = c(-.75, 1.25)} appear to provide liberal coverage for
 plausible changes in pupil diameter and area, respectively, and you want your
-\code{lim} setting to err on the side of being too wide. The \code{lim}
-argument is meant to serve as an "extra layer of security" to catch a
-minority of artifacts that slip past the primary detection algorithm. So a
-narrower `lim` will generate far more false positives than a wider `lim` will
-generate false negatives.
+\code{lim} setting to err on the side of being too wide.
 }
 
 \section{Warning}{
 
-If the time series contains gaps that are too long for interpolation (as
-defined in the \code{max_gap} argument) or if the extrapolated portion of
-the time series exceeds the range specified in the \code{lim} argument and
-\code{threshold} is set to \code{FALSE}, \code{fix_artifacts}
-will silently return a time series consisting of all missing values so that
-the user can easily identify which trials need to be dropped.
+If the time series contains periods of artifacts that are too long for
+interpolation defined by the \code{max_gap} argument, or if the total
+number of artifacts exceeds the proportion specified by the \code{max_loss}
+argument, \code{fix_artifacts} will silently return a time series consisting
+of all missing values so that the user can easily identify which trials need
+to be dropped.
 }
 
 \section{Disclaimer}{

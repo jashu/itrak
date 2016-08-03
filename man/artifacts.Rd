@@ -97,11 +97,12 @@ for your measurement. For example, if you are measuring pupils, the normal
 pupil size in adults varies from a minimum diameter of about 2 mm (3 square
 mm area) to a maximum diameter of about 8 mm (50 square mm area) in bright
 light vs. darkness. This means if the pupil starts off at maximum dilation,
-it can experience at most a 75\% decrease in diameter (95\% reduction in area). If the pupil starts off at minimum dilation, it can
-experience at most a 300\% increase in diameter (1500\% increase in area).
-This would correspond to \code{lim = c(-0.75, 3)} for diameter and
-\code{lim = c(-0.95, 1500)} for area, but you should set your limits to be
-more conservative if you do not expect your measurements to span this range.
+it can experience at most a 75\% decrease in diameter (95\% reduction in
+area). If the pupil starts off at minimum dilation, it can experience at most
+a 300\% increase in diameter (1500\% increase in area). This would correspond
+to \code{lim = c(-0.75, 3)} for diameter and \code{lim = c(-0.95, 1500)} for
+area, but you should set your limits to be more conservative if you do not
+expect your measurements to span this range.
 
 For example, most users will measure pupils under moderate lighting
 conditions, so baseline pupil readings will start off closer to the center of

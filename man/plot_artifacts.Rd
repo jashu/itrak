@@ -4,7 +4,7 @@
 \alias{plot_artifacts}
 \title{Plot Artifacts}
 \usage{
-plot_artifacts(data, time, measure, artifacts, trial = NULL)
+plot_artifacts(data, time, measure, artifacts, oor = NULL, trial = NULL)
 }
 \arguments{
 \item{data}{Data frame containing time series.}
@@ -19,19 +19,24 @@ Will be plotted on the y-axis.}
 which observations in the \code{measure} time series are artifacts.
 See \code{\link{get_artifacts}}.}
 
+\item{oor}{Optional name of variable containing logical vector that indexes
+which observations in the \code{measure} time series are out of range.
+See \code{\link{get_oor}}.}
+
 \item{trial}{If the data contains multiple time series, name of the variable
 that identifies each time series. Will be plotted using \code{facet_wrap}.}
 }
 \description{
-\code{plot_artifacts} returns a plot of time series with
-artifact intervals marked in red with vertical dotted lines.
+\code{plot_artifacts} returns a plot of time series with artifact intervals
+marked in red with dotted lines. Extreme values are marked with blue dotted
+lines.
 }
 \details{
 Use this plotting function to evaluate the performance of the
-\code{\link{get_artifacts}} function on one or more time series and the
-impact of changes to its threshold settings. If many artifacts are
-going undetected, try decreasing the \code{max_velocity} setting. If there
-are too many false positives, try increaasing it.
+\code{\link{get_artifacts}} and optionally \code{\link{get_oor}} functions on
+one or more time series. If many artifacts are going undetected, try
+decreasing the \code{max_velocity} setting. If there are too many false
+positives, try increaasing it.
 
 Plotting is performed using \code{\link[ggplot2]{ggplot}} and you can modify
 the aesthetics of the plot by appending layers using the \code{+} operator.

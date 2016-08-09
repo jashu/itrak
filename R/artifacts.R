@@ -50,7 +50,11 @@
 #' psychological stimuli using our eye-tracking setup, \code{lim = c(-0.5, 0.5)}
 #' and \code{lim = c(-.75, 1.25)} appear to provide liberal coverage for
 #' plausible changes in pupil diameter and area, respectively, and you want your
-#' \code{lim} setting to err on the side of being too wide.
+#' \code{lim} setting to err on the side of being too wide. Note that
+#' \code{fix_artifacts} calls the \code{get_oor} ("oor" for "out of range")
+#' function to identify which periods of the time series violate the \code{lim}
+#' argument. If you wish to know which periods are out of range, you can also
+#' call this function directly.
 #'
 #' @section Warning:
 #' If the time series contains periods of artifacts that are too long for
@@ -76,6 +80,14 @@
 #' ordered, positively valued observations separated by equal intervals of time.
 #'
 #' @param samp_freq Sampling frequency in Hz.
+#'
+#' @param max_velocity Maximum allowable velocity specified in terms of a
+#' quantile of the distribution of absolute values of first-order differences of
+#' the time series. Velocities that exceed the value of this quantile will be
+#' used to identify onset/offset of artifacts. Default value is 0.9 (90th
+#' percentile). Lower values will lead to greater sensitivity but less
+#' specificity in identifying signal spikes. Higher values will lead to less
+#' sensitivity but greater specificity.
 #'
 #' @param lim Two-item numeric vector \code{c(neg, pos)} specifying the negative
 #' and positive limits, respectively, of relative change from baseline
@@ -111,8 +123,15 @@
 #' not supplied by the user, then \code{fix_artifacts} will call
 #' \code{get_artifacts} itself.
 #'
+#' @param ...	further arguments passed to \code{get_artifacts} from
+#' \code{get_oor} or \code{fix_artifacts} if it has not already been used to
+#' create an \code{artifacts} vector.
+#'
 #' @return  \code{get_artifacts} returns a logical vector that can be used for
 #' logical indexing into the time series to identify data artifacts.
+#' \code{get_oor} returns a logical vector corresponding to elements of the time
+#' series that are out of range, as defined by amount of relative change from
+#' baseline using the \code{lim} and \code{baseline} arguments.
 #' \code{fix_artifacts} returns a copy of the time series with artifacts and
 #' missing data replaced by interpolated values, or a copy of the time series
 #' with all values changed to \code{NA} in the event that the artifacts are too
@@ -123,8 +142,7 @@ NULL
 
 #' @export
 #' @rdname artifacts
-
-get_artifacts <- function(ts, samp_freq, min_cont = 0.2){
+get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   #============================================================================
   # local helper functions
   #----------------------------------------------------------------------------
@@ -178,15 +196,15 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2){
   #-----------------------------------------------------------------------------
   artifact <- vector("logical", length(ts))
   lag <- floor(samp_freq/50)
-  max_velocity <- quantile(abs(diff(ts[ts > 0], lag = lag)),.9)
+  max_v <- quantile(abs(diff(ts[ts > 0], lag = lag)), max_velocity)
   margin <- floor(samp_freq * min_cont)
 
   #=============================================================================
   # artifact-detection algorithm
   #-----------------------------------------------------------------------------
   artifact[ts == 0] <- TRUE; forward <- artifact; backward <- artifact
-  forward[2:length(ts)] <- abs(diff(ts)) > max_velocity
-  backward[(length(ts)-1):1] <- abs(diff(ts[length(ts):1])) > max_velocity
+  forward[2:length(ts)] <- abs(diff(ts)) > max_v
+  backward[(length(ts)-1):1] <- abs(diff(ts[length(ts):1])) > max_v
   artifact <- merge_artifacts(artifact | forward | backward)
   artifact <- buffer_artifacts(artifact)
   artifact <- merge_artifacts(artifact)
@@ -195,21 +213,42 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2){
   # if there are any artifacts, run the algorithm again on the corrected ts
   #-----------------------------------------------------------------------------
   if(all(!artifact)) return(artifact)
-  get_artifacts(fix_artifacts(ts, samp_freq, lim = c(-Inf, Inf), max_loss = 1,
-                              max_gap = Inf, artifacts = artifact),
-                samp_freq, min_cont) | artifact
+  artifact <- get_artifacts(fix_artifacts(ts, samp_freq, artifacts = artifact,
+                                          max_gap = Inf, max_loss = 1),
+                            samp_freq,  min_cont, max_velocity) | artifact
+  merge_artifacts(artifact)
 }
-
 
 #' @export
 #' @rdname artifacts
-fix_artifacts <- function(ts, samp_freq, lim, baseline = NULL, max_loss = 0.5,
-                         max_gap = 1, min_cont = .2, artifacts = NULL){
+get_oor <- function(ts, samp_freq, lim, baseline = NULL, artifacts = NULL, ...){
+  # obtain cleaned time series without any constraints on max_loss or max_gap
+  ts <- fix_artifacts(ts = ts, samp_freq = samp_freq, baseline = baseline,
+                      artifacts = artifacts, ..., max_gap = Inf, max_loss = 1)
+  # determine absolute limits based on relative limits and baseline period
+  if(is.null(baseline)) baseline <- rep(TRUE, length(ts))
+  min_lim <- median(ts[baseline]) * (1+lim[1])
+  max_lim <- median(ts[baseline]) * (1+lim[2])
+
+  # return logical test for which parts of time series exceed lim argument
+  ts < min_lim | ts > max_lim
+}
+
+#' @export
+#' @rdname artifacts
+fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
+                          artifacts = NULL, ..., max_gap = 1, max_loss = 0.5){
   # store the number of observations in the time series as 'n'
   n <- length(ts)
   # if no logical vector of artifacts has been passed, run get_artifacts
   if(is.null(artifacts)){
-    artifacts <- get_artifacts(ts, samp_freq, min_cont)
+    artifacts <- get_artifacts(ts, samp_freq, ...)
+  }
+  # if limits have been passed, run get_oor and label out-of-range samples
+  # as artifacts
+  if(!is.null(lim)){
+    artifacts <- artifacts |
+      get_oor(ts, samp_freq, lim, baseline, artifacts, ...)
   }
   # set observations flagged as artifacts to missing
   ts[artifacts] <- NA_real_
@@ -277,21 +316,13 @@ fix_artifacts <- function(ts, samp_freq, lim, baseline = NULL, max_loss = 0.5,
       ts[i] <- ts[i+1] - lag1[i]
     }
   }
-  # threshold
-  if(is.null(baseline)) baseline <- rep(TRUE, length(ts))
-  min_lim <- median(ts[baseline]) * (1+lim[1])
-  max_lim <- median(ts[baseline]) * (1+lim[2])
-  out_of_range <- ts < min_lim | ts > max_lim
-  ts[ts < min_lim] <- min_lim
-  ts[ts > max_lim] <- max_lim
-  # if the proportion of out-of-range data exceeds the max_loss threshold,
-  # set all values of the time series to missing
-  if(sum(out_of_range) / length(ts) > max_loss) ts[] <- NA_real_
-  # calculate the run-lengths of consecutive out-of-range periods
-  runs <- rle(out_of_range)
-  gap <- runs$lengths[runs$values]
-  # if any out-of-range periods exceed the max_gap threshold, set all values of
-  # the time series to missing
-  if(any(gap > samp_freq * max_gap)) ts[] <- NA_real_
+  # threshold to lim argument, if it exists
+  if(!is.null(lim)){
+    if(is.null(baseline)) baseline <- rep(TRUE, length(ts))
+    min_lim <- median(ts[baseline]) * (1+lim[1])
+    max_lim <- median(ts[baseline]) * (1+lim[2])
+    ts[ts < min_lim] <- min_lim
+    ts[ts > max_lim] <- max_lim
+  }
   return(ts)
 }

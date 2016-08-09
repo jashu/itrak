@@ -4,12 +4,15 @@
 \alias{artifacts}
 \alias{fix_artifacts}
 \alias{get_artifacts}
+\alias{get_oor}
 \title{Time Series Artifact Detection and Correction}
 \usage{
-get_artifacts(ts, samp_freq, min_cont = 0.2)
+get_artifacts(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9)
 
-fix_artifacts(ts, samp_freq, lim, baseline = NULL, max_loss = 0.5,
-  max_gap = 1, min_cont = 0.2, artifacts = NULL)
+get_oor(ts, samp_freq, lim, baseline = NULL, artifacts = NULL, ...)
+
+fix_artifacts(ts, samp_freq, lim = NULL, baseline = NULL,
+  artifacts = NULL, ..., max_gap = 1, max_loss = 0.5)
 }
 \arguments{
 \item{ts}{A time series, passed as a numeric vector of chronologically
@@ -22,6 +25,14 @@ If the period of "good" data between two artifacts is less than this
 threshold, the two artifacts are merged into one. Default value is 0.2
 (200 ms).}
 
+\item{max_velocity}{Maximum allowable velocity specified in terms of a
+quantile of the distribution of absolute values of first-order differences of
+the time series. Velocities that exceed the value of this quantile will be
+used to identify onset/offset of artifacts. Default value is 0.9 (90th
+percentile). Lower values will lead to greater sensitivity but less
+specificity in identifying signal spikes. Higher values will lead to less
+sensitivity but greater specificity.}
+
 \item{lim}{Two-item numeric vector \code{c(neg, pos)} specifying the negative
 and positive limits, respectively, of relative change from baseline
 that is plausible for your time series. (See section "Advice on setting
@@ -33,11 +44,15 @@ determining whether values exceed the limits of relative change set in the
 \code{lim} argument. If there is no \code{baseline} provided, the mean of the
 entire series (excluding signal loss) will be used for this reference.}
 
-\item{max_loss}{Maximum fraction of time series that is allowed to contain
-dropped signal and/or artifacts. Default value is 0.5, meaning if more than
-half of the time series consists of artifacts, \code{fix_artifacts} will not
-perform interpolation/extrapolation and instead will return a vector of all
-\code{NA}s.}
+\item{artifacts}{A logical vector of equal length to the time series that
+provides logical indexing into which entries of the time series correspond
+to artifacts. This can be obtained by first calling \code{get_artifacts}. If
+not supplied by the user, then \code{fix_artifacts} will call
+\code{get_artifacts} itself.}
+
+\item{...}{further arguments passed to \code{get_artifacts} from
+\code{get_oor} or \code{fix_artifacts} if it has not already been used to
+create an \code{artifacts} vector.}
 
 \item{max_gap}{Maximum gap in seconds that an artifact period is allowed to
 span. Default value is 1 second, meaning if more than half of the time series
@@ -45,15 +60,18 @@ consists of artifacts, \code{fix_artifacts} will not perform
 interpolation/extrapolation and instead will return a vector of all
 \code{NA}s.}
 
-\item{artifacts}{A logical vector of equal length to the time series that
-provides logical indexing into which entries of the time series correspond
-to artifacts. This can be obtained by first calling \code{get_artifacts}. If
-not supplied by the user, then \code{fix_artifacts} will call
-\code{get_artifacts} itself.}
+\item{max_loss}{Maximum fraction of time series that is allowed to contain
+dropped signal and/or artifacts. Default value is 0.5, meaning if more than
+half of the time series consists of artifacts, \code{fix_artifacts} will not
+perform interpolation/extrapolation and instead will return a vector of all
+\code{NA}s.}
 }
 \value{
 \code{get_artifacts} returns a logical vector that can be used for
 logical indexing into the time series to identify data artifacts.
+\code{get_oor} returns a logical vector corresponding to elements of the time
+series that are out of range, as defined by amount of relative change from
+baseline using the \code{lim} and \code{baseline} arguments.
 \code{fix_artifacts} returns a copy of the time series with artifacts and
 missing data replaced by interpolated values, or a copy of the time series
 with all values changed to \code{NA} in the event that the artifacts are too
@@ -112,7 +130,11 @@ diameter and \code{lim = c(-0.85, 1.5)} for area. We have found that with
 psychological stimuli using our eye-tracking setup, \code{lim = c(-0.5, 0.5)}
 and \code{lim = c(-.75, 1.25)} appear to provide liberal coverage for
 plausible changes in pupil diameter and area, respectively, and you want your
-\code{lim} setting to err on the side of being too wide.
+\code{lim} setting to err on the side of being too wide. Note that
+\code{fix_artifacts} calls the \code{get_oor} ("oor" for "out of range")
+function to identify which periods of the time series violate the \code{lim}
+argument. If you wish to know which periods are out of range, you can also
+call this function directly.
 }
 
 \section{Warning}{

@@ -11,7 +11,7 @@ Description: Provides functions to facilitate the processing of data from
     functions are provided to address common data-cleaning chores associated
     with multi-trial experimental data.
 Depends:
-    R (>= 3.3),
+    R (>= 3.2),
     stats,
     methods
 Imports:

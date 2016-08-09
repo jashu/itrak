@@ -1,3 +1,42 @@
+# itrak 0.0.0.9201
+
+This update reflects a major overhaul in the implementation of the `get_artifacts` and `fix_artifacts` functions.
+
+## Improved speed
+
+The fundamental algorithm for identifying artifacts remains essentially unchanged, but the underlying code now implements a vectorized (as opposed to iterative) execution, resulting in more than a 10X speedup in the runtime of `get_artifacts` without any loss in performance.
+
+## Improved performance
+
+Occasionally, for especially noisy time series, the previous version of `get_artifacts` could miss some of the less severe artifacts. These would have to be spotted using `plot_artifacts` and manually identified before running `fix_artifacts`, or, more expediently, one could take the output of `fix_artifacts` (after the more severe artifacts have been removed) and run `get_artifacts` again to identify remaining artifacts. This latter recursive solution is now implemented automatically so that the output of `get_artifacts` reflects the ultimate conclusion of a back-and-forth between `get_artifacts` and `fix_artifacts` until `get_artifacts` cannot identify any artifacts in the output of `fix_artifacts`.
+
+## Separation of signal-spike artifacts from signal-drift artifacts
+
+Previously, the `get_artifacts` function would apply `lim`, `baseline`, `max_loss`, and `max_gap` arguments to the identification of artifacts. Periods of signal-spike artifacts (e.g. blinks) would be identified in the same step as periods of signal-drift artifacts (i.e., values outside the range specified in the `lim` argument). And if `max_loss` or `max_gap` criteria were violated, the entire time series would be marked as artifacts. This conflation made it difficult to evaluate how well signal spikes are being labeled in such trials when using `plot_artifacts`. The new implementation of `get_artifacts` only labels signal-spike artifacts. Signal-drift artifacts can now be obtained separately via the `get_oor` ("oor" stands for "out of range") function, and the `plot_artifacts` now includes an optional `oor` argument. As before, signal-spike artifacts will be indicated by red dotted lines, but now out-of-range artifacts will be indicated by blue dotted lines if an `oor` vector is passed. The `max_loss` and `max_gap` criteria for trial exclusion are no longer implemented at the `get_artifacts` stage, but rather at the `fix_artifacts` stage.
+
+## `lim` argument evaluated AFTER interpolation/extrapolation over artifacts
+
+Previously, the `lim` argument was evaluated prior to artifact removal by `fix_artifacts`. This worked well in most cases, but occasionally led to erroneous identification of signal-drift artifacts when the period identified as `baseline` consisted primarily of signal-spike artifacts. In the new implementation, signal-drift (out-of-range) artifacts are evaluated *after* spike-artifact correction, insuring that the baseline reference period contains only clean data.
+
+## `max_velocity` now specified in quantile units instead of absolute units
+
+Previously, `get_artifacts` permitted the user to override the automatic determination of the magnitude of change between samples that distinguishes normal signal change from the onset (or offset) of an artifact. This was occasionally necessary when dealing with unusually erratic time series. The new recursive implementation of `get_artifacts` appears to take care of such scenarios, obviating the need for this argument. Instead, the user is now permitted to use this argument to specify a different quantile for determining velocity outliers other than the default `0.9` (90th percentile). Extensive testing established `0.9` as the optimal cutoff for pupil change, and there should be no need to change this setting if you are applying `get_artifacts` to pupillometry data. However, if you are experimenting with other kinds of time series, another quantile may prove more optimal, and you may wish to increase the `max_velocity` quantile to reduce false positives, or decrease it to reduce false negatives.
+
+## List of specific changes to user interface
+
+The above changes are reflected by the following changes to the function arguments:
+
+1. `get_artifacts` no longer accepts the `baseline`, `lim`, `max_loss`, and `max_gap` arguments. It is now streamlined to 2 required arguments (`ts` and `samp_freq`) and 2 optional arguments (`min_cont` and `max_velocity`).
+
+2. The `max_velocity` argument used by `get_artifacts` is now specified in quantile units.
+
+3. The `threshold` argument has been removed from `fix_artifacts`. This argument was only rarely relevant. It only applies when the time series either begins or ends with an artifact and the extrapolation performed by `fix_artifacts` exceeds the range specified by `lim`. The user could formerly set `threshold = FALSE`, which would result in the complete rejection of such trials. Thresholding is now always performed when extrapolating. There is no reason to reject trials that have been thresholded so long as the period of thresholding is short, and trials will still be rejected if the thresholded period exceeds the `max_gap` argument.
+
+4. New `get_oor` function for explicitly identifying data points that are out of range. Documented in the same help file with `get_artifacts` and `fix_artifacts`.
+
+5. `plot_artifacts` adds an `oor` argument for labeling out-of-range data distinct from artifact data.
+
+
 # itrak 0.0.0.9110
 
 This update reflects a minor change to the artifact detection defaults and a

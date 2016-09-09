@@ -213,9 +213,11 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   # if there are any artifacts, run the algorithm again on the corrected ts
   #-----------------------------------------------------------------------------
   if(all(!artifact)) return(artifact)
-  artifact <- get_artifacts(fix_artifacts(ts, samp_freq, artifacts = artifact,
-                                          max_gap = Inf, max_loss = 1),
-                            samp_freq,  min_cont, max_velocity) | artifact
+  new_ts <- fix_artifacts(ts, samp_freq, artifacts = artifact,
+                          max_gap = Inf, max_loss = 1)
+  if(all(is.na(new_ts))) return(artifact)
+  artifact <- artifact |
+    get_artifacts(new_ts, samp_freq, min_cont, max_velocity)
   merge_artifacts(artifact)
 }
 
@@ -277,20 +279,19 @@ fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
   # if there is missing data at end of trial
   if(is.na(ts[n])){
     # h = the length of the final gap in the trial
-    h = gap[length(gap)]
+    h <- gap[length(gap)]
     # [n-2h : n-h] = the interval immediately preceding the final gap that is
-    # equal in length to the final gap plus 1
-    matched_interval = ts[(n-2*h):(n-h)]
+    # equal in length to the final gap plus 1.
     # if the length of the final gap is more than half the length of the entire
     # time series, or if there are any missing values in the matched interval,
     # cancel the interpolation.
-    if(h > n/2 || any(is.na(matched_interval))){
+    if(h > n/2 || any(is.na(ts[(n-2*h):(n-h)]))){
       ts[] <- NA_real_
       return(ts)
     }
     # otherwise, compute the lag-1 differences over the matched interval
-    lag1 <- diff(matched_interval)
-    # and repeat these difference over the missing interval
+    lag1 <- diff(ts[(n-2*h):(n-h)])
+    # and repeat these differences over the missing interval
     for(i in 1:h){
       ts[n-h+i] <- ts[n-h+i-1] + lag1[i]
     }
@@ -301,16 +302,15 @@ fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
     h = gap[1]
     # [h+1 : 2h+1] = the interval immediately following the first gap that is
     # equal in length to the first gap plus 1
-    matched_interval = ts[(h+1):(2*h+1)]
     # if the length of the initial gap is more than half the length of the
     # entire time series, or if there are any missing values in the matched
     # interval, cancel the interpolation.
-    if(h > n/2 || any(is.na(matched_interval))){
+    if(h > n/2 || any(is.na(ts[(h+1):(2*h+1)]))){
       ts[] <- NA_real_
       return(ts)
     }
     # otherwise, compute the lag-1 differences over the matched interval
-    lag1 <- diff(matched_interval)
+    lag1 <- diff(ts[(h+1):(2*h+1)])
     # and repeat these differences over the missing interval
     for(i in h:1){
       ts[i] <- ts[i+1] - lag1[i]

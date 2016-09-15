@@ -316,13 +316,14 @@ fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
       ts[i] <- ts[i+1] - lag1[i]
     }
   }
-  # threshold to lim argument, if it exists
+  # threshold to lim argument, if it exists; otherwise to lower bound of 0
+  min_lim <- 0; max_lim <- Inf
   if(!is.null(lim)){
     if(is.null(baseline)) baseline <- rep(TRUE, length(ts))
     min_lim <- median(ts[baseline]) * (1+lim[1])
     max_lim <- median(ts[baseline]) * (1+lim[2])
-    ts[ts < min_lim] <- min_lim
-    ts[ts > max_lim] <- max_lim
   }
-  return(ts)
+  ts[ts < min_lim] <- min_lim
+  ts[ts > max_lim] <- max_lim
+  ts
 }

@@ -4,7 +4,7 @@
 \alias{get_bs}
 \title{Mean bias score}
 \usage{
-get_bs(RT, congruent)
+get_bs(RT, congruent, prior_weights = NULL)
 }
 \arguments{
 \item{RT}{A numeric vector of reaction times in chronological order.}

@@ -4,7 +4,8 @@
 \alias{summarize_bias}
 \title{Summary of attention bias metrics}
 \usage{
-summarize_bias(data, RT, congruent, weighted = TRUE, search_limit = 5)
+summarize_bias(data, RT, congruent, prior_weights, method = "weighted",
+  search_limit = 5, fill_gaps = TRUE)
 }
 \arguments{
 \item{data}{A data frame or table.}
@@ -16,18 +17,18 @@ chronologically ordered observations of numeric type.}
 indicators of whether the corresponding entry of \code{RT} is a congruent
 \code{TRUE} or incongruent \code{FALSE} trial.}
 
-\item{weighted}{A logical value. If \code{TRUE} (the default), each congruent
-trial is subtracted from the weighted mean of \emph{both} the preceding
-\emph{and} subsequent incongruent trials (with the closer of the two trials
-receiving the stronger weight). If \code{FALSE}, the method described by
-Zvielli et al. (2015) is implemented, and each congruent trial is subtracted
-from the single nearest incongruent trial (\emph{either} the preceding
-\emph{or} subsequent trial). See \code{\link{get_tlbs}} for details.}
-
 \item{search_limit}{When calculating trial-level bias, how many trials to
 look forward or backward to find a trial of opposite type. Default value is
 5. If no match is found within the \code{search_limit} of a trial, \code{NA}
 will be assigned to that trial.}
+
+\item{weighted}{A logical value. If \code{TRUE} (the default), each congruent
+trial is subtracted from the weighted mean of \emph{both} the incongruent
+trials (with closer of trials receiving the stronger weight). If
+\code{FALSE}, the method described by Zvielli et al. (2015) is implemented,
+and each congruent trial is subtracted from the single nearest incongruent
+trial (\emph{either} the preceding \emph{or} subsequent trial). See
+\code{\link{get_tlbs}} for details.}
 }
 \value{
 An object of the same class as \code{data} with the following

@@ -4,7 +4,8 @@
 \alias{get_tlbs}
 \title{Trial-level Bias Score}
 \usage{
-get_tlbs(RT, congruent, weighted = TRUE, search_limit = 5)
+get_tlbs(RT, congruent, prior_weights = NULL, method = "weighted",
+  search_limit = 5, fill_gaps = TRUE)
 }
 \arguments{
 \item{RT}{A numeric vector of reaction times in chronological order.}
@@ -13,18 +14,17 @@ get_tlbs(RT, congruent, weighted = TRUE, search_limit = 5)
 whether the corresponding entry of \code{RT} is a congruent \code{TRUE} or
 incongruent \code{FALSE} trial.}
 
-\item{weighted}{A logical value. If \code{TRUE} (the default), each congruent
-trial is subtracted from the weighted mean of \emph{both} the preceding
-\emph{and} subsequent incongruent trials (with the closer of the two trials
-receiving the stronger weight). If \code{FALSE}, the method described by
-Zvielli et al. (2015) is implemented, and each congruent trial is subtracted
-from the single nearest incongruent trial (\emph{either} the preceding
-\emph{or} subsequent trial).}
-
-\item{search_limit}{If using \code{method = "discrete"}, an integer
+\item{search_limit}{If using \code{weighted = FALSE}, an integer
 indicating how many trials to look forward or backward to find a trial of
 opposite type. Default value is 5. If no match is found within the
 \code{search_limit} of a trial, \code{NA} will be returned for that trial.}
+
+\item{weighted}{A logical value. If \code{TRUE} (the default), each congruent
+trial is subtracted from the weighted mean of all incongruent trials (with
+closer trials receiving the stronger weight). If \code{FALSE}, the method
+described by Zvielli et al. (2015) is implemented, and each congruent trial
+is subtracted from the single nearest incongruent trial (\emph{either} the
+preceding \emph{or} subsequent trial).}
 }
 \value{
 A vector of trial-level bias scores.
@@ -40,20 +40,14 @@ by taking the mean of all CTs and subtracting it from the mean of all ITs,
 i.e., \eqn{bias = IT - CT}. Zvielli et al. (2015) proposed a trial-level bias
 score (TL-BS), which computes a bias score for every trial by comparing it to
 the most temporally proximal trial of opposite type. If the \code{weighted}
-argument is changed to \code{FALSE}, \code{get_tlbs} implements this
+argument is set to \code{FALSE}, \code{get_tlbs} implements this
 nearest-trial method of calcualting TL-BS. By default
 (\code{weighted = TRUE}) \code{get_tlbs} uses an alternative weighted-trials
-method. For the first and last 2 IT-CT pairs, the methods are equivalent, but
-for all trials in between the weighted method calculates the mean of the
-preceding and subsequent trials of opposite type, with the closer trial
-weighted more heavily than the more distant trial. This is computed by
-constructing a CT time series with missing values in place of ITs (and vice
-versa), performing a linear interpolation over the missing values, and then
-subtracting the approximated complete CT time series from the approximated
-complete IT time series. Thus, each real CT is subtracted from a
-\emph{projected} IT that lies on an imaginary line connecting the two
-surrounding real ITs, and a similarly projected CT is subtracted from each
-real IT.
+method that calculates the weighted mean of all trials of opposite type, with
+closer trials weighted more heavily than more distant trials (as a function
+of the inverse square of trial distance.) To calculate TLBS, each CT is
+subtracted from the weighted mean of all ITs, and the weighted mean of all
+CTs is subtracted from each IT.
 
 The two methods yield highly similar TL-BS numbers, but the weighted method
 may be preferable for two reasons: 1) In the event that a trial of one type
@@ -67,9 +61,7 @@ trials. This double counting results in brief but frequent artifactual
 periods where the TL-BS time series is completely flat. (See examples below.)
 Under the weighted method, these calculations will be non-identical because a
 trial is not subtracted directly from another single trial, but rather from
-the weighted mean of unique trial pairs. In the above example, the interior
-CT would not be subtracted from the preceding IT, but rather from the
-weighted average of the preceding IT and whatever IT comes next.
+uniquely weighted means of all trial pairs.
 }
 \examples{
 # Create example time series of 50 reaction times in ms:

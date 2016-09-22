@@ -82,12 +82,12 @@
 #'  \code{TRUE} or incongruent \code{FALSE} trial.
 #'
 #' @param weighted A logical value. If \code{TRUE} (the default), each congruent
-#'  trial is subtracted from the weighted mean of \emph{both} the preceding
-#'  \emph{and} subsequent incongruent trials (with the closer of the two trials
-#'  receiving the stronger weight). If \code{FALSE}, the method described by
-#'  Zvielli et al. (2015) is implemented, and each congruent trial is subtracted
-#'  from the single nearest incongruent trial (\emph{either} the preceding
-#'  \emph{or} subsequent trial). See \code{\link{get_tlbs}} for details.
+#'  trial is subtracted from the weighted mean of \emph{both} the incongruent
+#'  trials (with closer of trials receiving the stronger weight). If
+#'  \code{FALSE}, the method described by Zvielli et al. (2015) is implemented,
+#'  and each congruent trial is subtracted from the single nearest incongruent
+#'  trial (\emph{either} the preceding \emph{or} subsequent trial). See
+#'  \code{\link{get_tlbs}} for details.
 #'
 #' @param search_limit When calculating trial-level bias, how many trials to
 #'  look forward or backward to find a trial of opposite type. Default value is
@@ -140,20 +140,45 @@
 #'
 #' @export
 
-summarize_bias <- function(data, RT, congruent, weighted = TRUE,
-                           search_limit = 5){
+summarize_bias <- function(data, RT, congruent, prior_weights,
+                           method = "weighted", search_limit = 5,
+                           fill_gaps = TRUE){
   a <- as.list(match.call())
   data$RT <- eval(a$RT, data)
   data$congruent <- eval(a$congruent, data)
+  wt <- eval(a$prior_weights, data)
+  if(suppressWarnings(is.null(wt))){
+    data$prior_weights <- rep(1, length(data$RT))
+  } else {
+    data$prior_weights <- wt
+  }
+  mean_wt <- data$prior_weights
+  min_wt <- min(mean_wt, na.rm = T)
+  if(min_wt <= 0) mean_wt <- mean_wt + abs(min_wt) + 1
+  mean_wt[is.na(mean_wt)] <- 0
+  data$mean_wt <- mean_wt
   data <- dplyr::mutate(data,
-                        tlbs = get_tlbs(RT, congruent, weighted, search_limit))
+                        tlbs = get_tlbs(RT, congruent, prior_weights,
+                                        method, search_limit, fill_gaps))
+  var_wt <- function(wt){
+    wt <- abs(diff(wt))
+    wt <- max(wt, na.rm = T) - wt + 1
+    wt[is.na(wt)] <- 0
+    wt
+  }
   dplyr::summarize(data,
-                   mean_bias = get_bs(RT, congruent),
-                   mean_toward = mean(tlbs[tlbs > 0], na.rm = T),
-                   mean_away = -1 * mean(tlbs[tlbs < 0], na.rm = T),
-                   peak_toward = max(tlbs, na.rm = T),
-                   peak_away = -1 * min(tlbs, na.rm = T),
-                   variability = mean(abs(diff(tlbs)), na.rm = T),
+                   mean_bias = get_bs(RT, congruent, prior_weights),
+                   mean_toward = weighted.mean(tlbs[tlbs > 0],
+                                               mean_wt[tlbs > 0],
+                                               na.rm = T),
+                   mean_away = -1 * weighted.mean(tlbs[tlbs < 0],
+                                                  mean_wt[tlbs < 0],
+                                                  na.rm = T),
+                   peak_toward = tlbs[which.max(tlbs * mean_wt)],
+                   peak_away = -1 * tlbs[which.min(tlbs * mean_wt)],
+                   variability = weighted.mean(abs(diff(tlbs)),
+                                               var_wt(prior_weights),
+                                               na.rm = T),
                    trials_toward = sum(!is.na(tlbs[tlbs > 0])),
                    trials_away = sum(!is.na(tlbs[tlbs < 0])),
                    trials_NA = sum(is.na(tlbs)),

@@ -9,20 +9,14 @@
 #' i.e., \eqn{bias = IT - CT}. Zvielli et al. (2015) proposed a trial-level bias
 #' score (TL-BS), which computes a bias score for every trial by comparing it to
 #' the most temporally proximal trial of opposite type. If the \code{weighted}
-#' argument is changed to \code{FALSE}, \code{get_tlbs} implements this
+#' argument is set to \code{FALSE}, \code{get_tlbs} implements this
 #' nearest-trial method of calcualting TL-BS. By default
 #' (\code{weighted = TRUE}) \code{get_tlbs} uses an alternative weighted-trials
-#' method. For the first and last 2 IT-CT pairs, the methods are equivalent, but
-#' for all trials in between the weighted method calculates the mean of the
-#' preceding and subsequent trials of opposite type, with the closer trial
-#' weighted more heavily than the more distant trial. This is computed by
-#' constructing a CT time series with missing values in place of ITs (and vice
-#' versa), performing a linear interpolation over the missing values, and then
-#' subtracting the approximated complete CT time series from the approximated
-#' complete IT time series. Thus, each real CT is subtracted from a
-#' \emph{projected} IT that lies on an imaginary line connecting the two
-#' surrounding real ITs, and a similarly projected CT is subtracted from each
-#' real IT.
+#' method that calculates the weighted mean of all trials of opposite type, with
+#' closer trials weighted more heavily than more distant trials (as a function
+#' of the inverse square of trial distance.) To calculate TLBS, each CT is
+#' subtracted from the weighted mean of all ITs, and the weighted mean of all
+#' CTs is subtracted from each IT.
 #'
 #' The two methods yield highly similar TL-BS numbers, but the weighted method
 #' may be preferable for two reasons: 1) In the event that a trial of one type
@@ -36,9 +30,7 @@
 #' periods where the TL-BS time series is completely flat. (See examples below.)
 #' Under the weighted method, these calculations will be non-identical because a
 #' trial is not subtracted directly from another single trial, but rather from
-#' the weighted mean of unique trial pairs. In the above example, the interior
-#' CT would not be subtracted from the preceding IT, but rather from the
-#' weighted average of the preceding IT and whatever IT comes next.
+#' uniquely weighted means of all trial pairs.
 #'
 #' @references Zvielli A, Bernstein A, Koster EHW. 2015. Temporal dynamics of
 #' attentional bias. \emph{Clinical Psychological Science}. 3(5):772-788.
@@ -52,14 +44,13 @@
 #'  incongruent \code{FALSE} trial.
 #'
 #' @param weighted A logical value. If \code{TRUE} (the default), each congruent
-#'  trial is subtracted from the weighted mean of \emph{both} the preceding
-#'  \emph{and} subsequent incongruent trials (with the closer of the two trials
-#'  receiving the stronger weight). If \code{FALSE}, the method described by
-#'  Zvielli et al. (2015) is implemented, and each congruent trial is subtracted
-#'  from the single nearest incongruent trial (\emph{either} the preceding
-#'  \emph{or} subsequent trial).
+#'  trial is subtracted from the weighted mean of all incongruent trials (with
+#'  closer trials receiving the stronger weight). If \code{FALSE}, the method
+#'  described by Zvielli et al. (2015) is implemented, and each congruent trial
+#'  is subtracted from the single nearest incongruent trial (\emph{either} the
+#'  preceding \emph{or} subsequent trial).
 #'
-#' @param search_limit If using \code{method = "discrete"}, an integer
+#' @param search_limit If using \code{weighted = FALSE}, an integer
 #'  indicating how many trials to look forward or backward to find a trial of
 #'  opposite type. Default value is 5. If no match is found within the
 #'  \code{search_limit} of a trial, \code{NA} will be returned for that trial.
@@ -91,41 +82,64 @@
 
 #' @export
 
-get_tlbs <- function(RT, congruent, weighted = TRUE, search_limit = 5){
+get_tlbs <- function(RT, congruent, prior_weights = NULL,
+                     method = "weighted", search_limit = 5,
+                     fill_gaps = TRUE){
   if(length(RT) != length(congruent))
     stop("RT and congruent vectors must contain the same number of trials.")
   if(typeof(congruent) != "logical")
     stop("congruent must be a logical vector (TRUE or FALSE)")
+  if(is.null(prior_weights)) prior_weights <- rep(1, length(RT))
+  min_wt <- min(prior_weights, na.rm = T)
+  if(min_wt <= 0) prior_weights <- prior_weights + abs(min_wt) + 1
+  prior_weights[is.na(prior_weights)] <- 0
+  CT <- RT[congruent]
+  IT <- RT[!congruent]
+  CT_wt <- prior_weights[congruent]
+  IT_wt <- prior_weights[!congruent]
   tlbs <- vector("numeric", length(RT))
-  for(i in seq_along(tlbs)){
-    begin <- i - search_limit
-    if(begin < 1) begin <- 1
-    end <- i + search_limit
-    if(end > length(tlbs)) end <- length(tlbs)
-    trials <- begin:end
-    candidates <- trials[congruent[begin:end] != congruent[i] &
-                           !is.na(RT[begin:end])]
-    if(length(candidates) == 0){
-      tlbs[i] <- NA_real_
-      next
+  if(method == "weighted"){
+    for(i in seq_along(tlbs)){
+      before_i <- 1:max(i-1, 1)
+      after_i <- min(i+1, length(tlbs)):length(tlbs)
+      if(i == 1 || i == length(tlbs)){
+        trial_dist <- c(i - before_i, after_i - i)
+      } else {
+        trial_dist <- c(i - before_i, 0, after_i - i)
+      }
+      if(congruent[i]){
+        wt <- IT_wt / (trial_dist[!congruent])^2
+        tlbs[i] <- weighted.mean(IT, wt, na.rm = TRUE) - RT[i]
+      } else {
+        wt <- CT_wt / (trial_dist[congruent])^2
+        tlbs[i] <- RT[i] - weighted.mean(CT, wt, na.rm = TRUE)
+      }
     }
-    trial_dist <- abs(i - candidates)
-    match <- candidates[which.min(trial_dist)]
-    temp_tlbs <- RT[i] - RT[match]
-    tlbs[i] <- ifelse(congruent[i], -1*temp_tlbs, temp_tlbs)
+  } else{
+    for(i in seq_along(tlbs)){
+      begin <- i - search_limit
+      if(begin < 1) begin <- 1
+      end <- i + search_limit
+      if(end > length(tlbs)) end <- length(tlbs)
+      trials <- begin:end
+      candidates <- trials[congruent[begin:end] != congruent[i] &
+                             !is.na(RT[begin:end])]
+      if(length(candidates) == 0){
+        tlbs[i] <- NA_real_
+        next
+      }
+      trial_dist <- abs(i - candidates)
+      match <- candidates[which.min(trial_dist)]
+      temp_tlbs <- RT[i] - RT[match]
+      tlbs[i] <- ifelse(congruent[i], -1*temp_tlbs, temp_tlbs)
+    }
   }
 
-  if(weighted){
-    IT <- RT; CT <- RT
-    IT[congruent] <- NA_real_
-    CT[!congruent] <- NA_real_
-    IT <- zoo::na.approx(IT, na.rm = FALSE)
-    IT <- zoo::na.locf(IT, na.rm = FALSE)
-    IT <- zoo::na.locf(IT, na.rm = FALSE, fromLast = TRUE)
-    CT <- zoo::na.approx(CT, na.rm = FALSE)
-    CT <- zoo::na.locf(CT, na.rm = FALSE)
-    CT <- zoo::na.locf(CT, na.rm = FALSE, fromLast = TRUE)
-    tlbs[!is.na(tlbs)] <- (IT - CT)[!is.na(tlbs)]
+  if(fill_gaps){
+    tlbs <- zoo::na.approx(tlbs, na.rm = FALSE)
+    tlbs <- zoo::na.locf(tlbs, na.rm = FALSE)
+    tlbs<- zoo::na.locf(tlbs, na.rm = FALSE, fromLast = TRUE)
   }
-  return(tlbs)
+
+  tlbs
 }

@@ -9,7 +9,13 @@
 #'  whether the corresponding entry of \code{RT} is a congruent \code{TRUE} or
 #'  incongruent \code{FALSE} trial.
 #'
-#' @return A length-one numeric vector.
+#' @param prior_weights Optional numeric vector of prior weights indicating the
+#'  relative influence that each trial should have on the calculation of
+#'  mean bias, in the event that there is reason to weight some trials more than
+#'  others when calculating their mean.
+#'
+#' @return A length-one numeric vector of mean, or optionally weighted mean,
+#'  bias scores.
 #'
 #' @examples
 #' # Create example time series of 10 reaction times in ms:

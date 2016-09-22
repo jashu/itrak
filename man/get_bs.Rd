@@ -12,9 +12,15 @@ get_bs(RT, congruent, prior_weights = NULL)
 \item{congruent}{A logical vector equal in length to \code{RT} that indicates
 whether the corresponding entry of \code{RT} is a congruent \code{TRUE} or
 incongruent \code{FALSE} trial.}
+
+\item{prior_weights}{Optional numeric vector of prior weights indicating the
+relative influence that each trial should have on the calculation of
+mean bias, in the event that there is reason to weight some trials more than
+others when calculating their mean.}
 }
 \value{
-A length-one numeric vector.
+A length-one numeric vector of mean, or optionally weighted mean,
+ bias scores.
 }
 \description{
 \code{get_bs} returns the mean difference between trials of dichotomous

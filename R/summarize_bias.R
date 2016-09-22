@@ -81,24 +81,32 @@
 #'  indicators of whether the corresponding entry of \code{RT} is a congruent
 #'  \code{TRUE} or incongruent \code{FALSE} trial.
 #'
-#' @param weighted A logical value. If \code{TRUE} (the default), each congruent
-#'  trial is subtracted from the weighted mean of \emph{both} the incongruent
-#'  trials (with closer of trials receiving the stronger weight). If
-#'  \code{FALSE}, the method described by Zvielli et al. (2015) is implemented,
-#'  and each congruent trial is subtracted from the single nearest incongruent
-#'  trial (\emph{either} the preceding \emph{or} subsequent trial). See
-#'  \code{\link{get_tlbs}} for details.
+#' @param prior_weights Optional name of column in \code{data} that contains
+#' prior weights indicating the relative influence that each trial should have
+#' on the calculation of TLBS and summary metrics. If not provided, all trials
+#' are assumed to carry equal weight.
 #'
-#' @param search_limit When calculating trial-level bias, how many trials to
-#'  look forward or backward to find a trial of opposite type. Default value is
-#'  5. If no match is found within the \code{search_limit} of a trial, \code{NA}
-#'  will be assigned to that trial.
+#' @param method String indicating method to be used to calculate TLBS. The
+#' default method "\code{weighted}" compares each trial to the distance-weighted
+#' mean of all trials of opposite type. If \code{method = "nearest"}, the method
+#' described by Zvielli et al. (2015) is implemented, and each trial is compared
+#' to the single nearest trial of opposite type. See \code{\link{get_tlbs}} for
+#' details.
+#'
+#' @param search_limit If using \code{method = "nearest"}, an integer indicating
+#' how many trials to look forward or backward to find a trial of opposite type.
+#' Default value is 5. If no match is found within the \code{search_limit} of a
+#' trial, \code{NA} will be returned for that trial.
+#'
+#' @param fill_gaps Logical indicating whether missing values in the TLBS time
+#' series should be imputed based on neighboring trials. Default is
+#' \code{FALSE}.
 #'
 #' @return An object of the same class as \code{data} with the following
 #' summary metrics:
 #' \describe{
-#'  \item{mean_bias}{Traditional bias score obtained by taking the mean of one
-#'  trial type and subtracting it from the mean of the opposite trial type.}
+#'  \item{mean_bias}{Traditional bias score obtained by taking the mean of
+#'  congruent trials and subtracting it from the mean of incongruent trials.}
 #'  \item{mean_toward}{Mean bias toward the target stimulus obtained by
 #'  calculating the mean of the positive trial-level bias scores.}
 #'  \item{mean_away}{Mean bias away from the target stimulus obtained by
@@ -116,9 +124,10 @@
 #'  \item{trials_away}{Number of trials during which bias was directed away from
 #'    the target.}
 #'  \item{trials_NA}{Number of trials for which a trial-level bias score could
-#'    not be computed, i.e., a trial of opposite type could not be found within
-#'    the \code{search_limit}}
-#'  \item{trials_total}{Total number of trials.}
+#'    not be computed, i.e, trial data is missing or a trial of opposite type
+#'    could not be found within the \code{search_limit}}
+#'  \item{trials_total}{Total number of trials detected. Useful as a validity
+#'    check.}
 #'  }
 #'
 #' @examples
@@ -142,7 +151,7 @@
 
 summarize_bias <- function(data, RT, congruent, prior_weights,
                            method = "weighted", search_limit = 5,
-                           fill_gaps = TRUE){
+                           fill_gaps = FALSE){
   a <- as.list(match.call())
   data$RT <- eval(a$RT, data)
   data$congruent <- eval(a$congruent, data)
@@ -166,6 +175,7 @@ summarize_bias <- function(data, RT, congruent, prior_weights,
     wt[is.na(wt)] <- 0
     wt
   }
+
   dplyr::summarize(data,
                    mean_bias = get_bs(RT, congruent, prior_weights),
                    mean_toward = weighted.mean(tlbs[tlbs > 0],

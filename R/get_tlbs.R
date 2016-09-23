@@ -40,8 +40,8 @@
 #' @param RT A numeric vector of reaction times in chronological order.
 #'
 #' @param congruent A logical vector equal in length to \code{RT} that indicates
-#'  whether the corresponding entry of \code{RT} is a congruent \code{TRUE} or
-#'  incongruent \code{FALSE} trial.
+#'  whether the corresponding entry of \code{RT} is a congruent (\code{TRUE}) or
+#'  incongruent (\code{FALSE}) trial.
 #'
 #' @param prior_weights Optional numeric vector of prior weights indicating the
 #'  relative influence that each trial should have on the calculation of TLBS
@@ -78,7 +78,7 @@
 #' weighted <- get_tlbs(RT = rt, congruent = congruent)
 #'
 #' # Calculate TL-BS using the nearest-trial method:
-#' unweighted <- get_tlbs(RT = rt, congruent = congruent, weighted = FALSE)
+#' unweighted <- get_tlbs(RT = rt, congruent = congruent, method = "nearest")
 #'
 #' # Note how the nearest-trial method results in intermittent plateaus because
 #' # of duplicated subtractions:
@@ -97,7 +97,7 @@ get_tlbs <- function(RT, congruent, prior_weights = NULL, method = "weighted",
   if(typeof(congruent) != "logical")
     stop("congruent must be a logical vector (TRUE or FALSE)")
   if(!method %in% c("weighted", "nearest"))
-    stop(paste(method, "method not supported.",
+    stop(paste("\"", method, "\" method not supported.",
                "Set method to either \"nearest\" or \"weighted\"."))
   if(is.null(prior_weights)) prior_weights <- rep(1, length(RT))
   min_wt <- min(prior_weights, na.rm = T)

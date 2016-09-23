@@ -11,8 +11,8 @@ get_tlbs(RT, congruent, prior_weights = NULL, method = "weighted",
 \item{RT}{A numeric vector of reaction times in chronological order.}
 
 \item{congruent}{A logical vector equal in length to \code{RT} that indicates
-whether the corresponding entry of \code{RT} is a congruent \code{TRUE} or
-incongruent \code{FALSE} trial.}
+whether the corresponding entry of \code{RT} is a congruent (\code{TRUE}) or
+incongruent (\code{FALSE}) trial.}
 
 \item{prior_weights}{Optional numeric vector of prior weights indicating the
 relative influence that each trial should have on the calculation of TLBS
@@ -84,7 +84,7 @@ congruent <- sample(c(TRUE,FALSE), 25, replace = TRUE)
 weighted <- get_tlbs(RT = rt, congruent = congruent)
 
 # Calculate TL-BS using the nearest-trial method:
-unweighted <- get_tlbs(RT = rt, congruent = congruent, weighted = FALSE)
+unweighted <- get_tlbs(RT = rt, congruent = congruent, method = "nearest")
 
 # Note how the nearest-trial method results in intermittent plateaus because
 # of duplicated subtractions:

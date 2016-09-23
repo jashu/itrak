@@ -1,21 +1,21 @@
 #' Mean bias score
 #'
-#' \code{get_bs} returns the mean difference between trials of dichotomous
-#' type.
+#' \code{get_bs} returns the mean difference between congruent and incongruent
+#' trials.
 #'
 #' @param RT A numeric vector of reaction times in chronological order.
 #'
 #' @param congruent A logical vector equal in length to \code{RT} that indicates
-#'  whether the corresponding entry of \code{RT} is a congruent \code{TRUE} or
-#'  incongruent \code{FALSE} trial.
+#'  whether the corresponding entry of \code{RT} is a congruent (\code{TRUE}) or
+#'  incongruent (\code{FALSE}) trial.
 #'
 #' @param prior_weights Optional numeric vector of prior weights indicating the
 #'  relative influence that each trial should have on the calculation of
 #'  mean bias, in the event that there is reason to weight some trials more than
 #'  others when calculating their mean.
 #'
-#' @return A length-one numeric vector of mean, or optionally weighted mean,
-#'  bias scores.
+#' @return A length-one numeric vector corresponding to the mean, or optionally
+#'  weighted mean, bias score.
 #'
 #' @examples
 #' # Create example time series of 10 reaction times in ms:

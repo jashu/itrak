@@ -213,7 +213,8 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   # if there are any artifacts, run the algorithm again on the corrected ts
   #-----------------------------------------------------------------------------
   if(all(!artifact)) return(artifact)
-  new_ts <- fix_artifacts(ts, samp_freq, artifacts = artifact,
+  new_ts <- fix_artifacts(ts, samp_freq, lim = c(-.99, Inf),
+                          artifacts = artifact,
                           max_gap = Inf, max_loss = 1)
   if(all(is.na(new_ts))) return(artifact)
   artifact <- artifact |

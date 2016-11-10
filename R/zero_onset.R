@@ -10,14 +10,18 @@
 #'
 #' @param onset Value of \code{marker} that indicates when the trial begins.
 #'
-#' @return Numeric vector that zeros \code{time} to the trial onset.
+#' @return Numeric vector that zeros \code{time} to the trial onset. In the
+#' event that no onset marker is found, a warning is issued and a vector of
+#' \code{NA}s is returned.
 #'
 #' @export
 
 zero_onset <- function(time, marker, onset){
   onset_time <- time[!is.na(marker) & marker == onset]
-  if(length(onset_time) == 0)
-    stop (paste(onset, "not found in onset marker"))
+  if(length(onset_time) == 0){
+    warning (paste(onset, "not found in onset marker"))
+    return(rep(NA, length(time)))
+  }
   if(length(onset_time) > 1)
     stop ("More than one instance of onset marker found.")
   time - onset_time

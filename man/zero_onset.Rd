@@ -15,7 +15,9 @@ a single time series.}
 \item{onset}{Value of \code{marker} that indicates when the trial begins.}
 }
 \value{
-Numeric vector that zeros \code{time} to the trial onset.
+Numeric vector that zeros \code{time} to the trial onset. In the
+event that no onset marker is found, a warning is issued and a vector of
+\code{NA}s is returned.
 }
 \description{
 Centers the sample index or time stamp of your time series to a reference

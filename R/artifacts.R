@@ -252,6 +252,7 @@ fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
   if(!is.null(lim)){
     artifacts <- artifacts |
       get_oor(ts, samp_freq, lim, baseline, artifacts, ...)
+    artifacts <- artifacts | is.na(artifacts)
   }
   # set observations flagged as artifacts to missing
   ts[artifacts] <- NA_real_

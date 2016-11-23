@@ -1,0 +1,210 @@
+---
+title: "How to clean pupil data using `itrak`"
+author: "Jason Shumake"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Cleaning Pupil Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette provides a walk-through of how to clean a pupil-measurement time series using `itrak` and `tidyverse`. Each section describes the use of a different `itrak` function. It is important that these functions be applied in the same sequence given here.
+
+```{r, message = FALSE}
+library(itrak); library(tidyverse)
+```
+
+# `pupil_data`
+
+The sample `pupil_data` included with the `itrak` package contains 9 experimental trials + 3 drift checks collected from an EyeLink 1000, sampling pupil area from a single eye at a frequency of 500 Hz. Each experimental trial includes a 2-second baseline period, followed by the presentation of an affective image for 6 seconds. `pupil_data` contains the following columns:
+
+- `"RECORDING_SESSION_LABEL"`: a unique index that identifies a single recording session. This will be renamed to `id` for short.
+
+```{r}
+pupil_data <- rename(pupil_data, id = RECORDING_SESSION_LABEL)
+```
+
+- `"SAMPLE_INDEX"`: an integer that numbers the samples of each trial from 1 to the total number of samples per trial. It should reset to 1 with each new trial.
+
+- `"SAMPLE_MESSAGE"`: a column containing a "stamp" indicating the onset of the experimental event for each trial, e.g., the transition from the baseline fixation period to the presentation of an image meant to evoke a pupillary response. In this data set, this event is given by the message "IAPSOnset".
+
+- `"TIMESTAMP"`: a numeric vector corresponding to the clock time at which each sample was recorded.
+
+- `"PUPIL_SIZE"`: a numeric vector containing pupil measurements. If you have a binocular eye tracking system, you may have separate vectors for the left and right pupils. The attached sample data contains a `"LEFT_PUPIL_SIZE"` and `"RIGHT_PUPIL_SIZE"` variable.
+
+# `get_freq`
+
+After importing your data file into R (e.g., by generating a tab-delimited text file from your eye-tracking software and reading this into R using the `read_tsv` function), first make note of your sampling frequency. If you know what this is (the sampling frequency of the sample data set was 500 Hz), you can set it explicitly. If you don't know what it is, the `get_freq` function can estimate it from your `TIMESTAMP` variable:
+
+```{r}
+samp_freq <- get_freq(pupil_data$TIMESTAMP)
+samp_freq
+```
+
+# `merge_eyes`
+
+Optionally, use the `merge_eyes` function if you have a binocular eye tracker and wish to merge readings from the left and right eyes into a single time series. Following this, you can drop the `LEFT_PUPIL_SIZE` and `RIGHT_PUPIL_SIZE` variables.
+
+```{r}
+pupil_data <- pupil_data %>%
+  mutate(pupil = merge_eyes(LEFT_PUPIL_SIZE, RIGHT_PUPIL_SIZE)) %>%
+  select(-LEFT_PUPIL_SIZE, -RIGHT_PUPIL_SIZE)
+```
+
+# `label_trial`
+
+Create trial numbers using `label_trial`. Following this, you can drop the `SAMPLE_INDEX` variable. Optionally, use the `marker` and `event` parameters to identify samples belonging to valid trials (and to ignore samples corresponding to drift checks or other extra-trial events); invalid readings will receive a trial label of `NA`, and these rows must be removed from the data frame before proceeding. 
+
+```{r}
+pupil_data <- pupil_data %>%
+  mutate(trial = label_trial(SAMPLE_INDEX, SAMPLE_MESSAGE, "IAPSOnset")) %>%
+  filter(!is.na(trial)) %>%
+  select(-SAMPLE_INDEX)
+```
+
+Verify that you have the correct number of trials. In this sample data set, there should be 9 trials.
+
+```{r}
+n_trials <- max(pupil_data$trial)
+n_trials
+```
+
+# `zero_onset`
+
+Identify when each trial starts using the function `zero_onset`. This will set time equal to 0 wherever the marker `"IAPS_Onset"` appears. Be sure to `group_by(trial)` before calling this function. You no longer need the `SAMPLE_MESSAGE` and `TIMESTAMP` columns after this step, and they can be removed if you wish.
+
+```{r}
+pupil_data <- pupil_data %>%
+  group_by(trial) %>%
+  mutate(time = zero_onset(TIMESTAMP, SAMPLE_MESSAGE, "IAPSOnset")) %>%
+  ungroup() %>%
+  select(-SAMPLE_MESSAGE, -TIMESTAMP)
+```
+
+# `clip_trials`
+
+The number of pupil readings from each trial must be the same, and there is usually some variability in this number. (There may be slightly more or less samples for some trials.) It's important to have time samples for participants all be the same length for a couple of reasons: 1) if there are fewer than the standard number of samples and trials, then missing samples/trials need to be explicitly coded as such for the subsequent artifact cleaning to work properly (i.e., missing time points at the beginning and end of trials need to be treated as artifacts); 2) the data cleaning algorithms were engineered for computational speed on the premise that the data set can be parallelized into equal-length vectors--they will outright fail if this assumption isn't met.
+
+For this sample data set, there is a baseline period of roughly 2 seconds before the trial starts, and the trial should stop after another 6 seconds. Ultimately, we will only use the last 100 ms of the baseline period to normalize each time series. However, for the initial artifact-cleaning, we will clip these trials to be between -1 sec and 6 sec. We want this extra buffer of baseline period in case the participant happens to blink during the 100 ms prior to trial onset, so that we can use the preceding data points to interpolate over the blink and still have a valid baseline reference to use for normalization. Use the function `clip_trials` to clip the trials to the specified length and to verify that all trials reach the specified length. It is possible that a trial may have started late or ended early, in which case `clip_trials` will issue a warning about how many samples are missing. You will need to then turn these implicit missing samples into explicit missing values (`NA`s). `tidyr::complete` can be used to accomplish this.
+
+```{r}
+pupil_data <- pupil_data %>% 
+  clip_trials(trial, time, -1000, 6000)
+# The following is only necessary if you are missing one or more samples, but
+# it can be safely run regardless. (It will leave the data unchanged if there
+# is nothing to fix.)
+pupil_data <- pupil_data %>% 
+  complete(nesting(id, trial), time) %>%
+  arrange(id, trial, time)
+```
+
+At this point, you might consider converting the time units from milliseconds to seconds. Seconds is the more meaningful time scale, and will make the x-axes of subsequent artifact plots more readable. 
+
+```{r}
+pupil_data$time <- pupil_data$time / 1000
+```
+
+# `get_artifacts`
+
+Identify which samples have artifacts using `get_artifacts` and store the results in a new variable called `artifact`. Be sure to `group_by` `trial` before calling this function, and also `id` if you are cleaning more than one recording session at a time.
+
+```{r}
+pupil_data <- pupil_data %>%
+  group_by(trial) %>%
+  mutate(artifact = get_artifacts(ts = pupil, samp_freq = 500)) %>%
+  ungroup()
+```
+
+# `get_oor`
+
+Identify which samples exceed drift limits using `get_oor` and store results in a new variable called `oor`. The recommended `lim` argument for pupil area in a psychological experiment (where changes in pupil dilation are evoked by emotional or cognitive stimuli) is `lim = c(-0.75, 1.25)`. (See the help file for this function for more advice on setting this parameter.) The recommended period to use as a baseline reference is the 100 ms preceding stimulus onset. Since we have zeroed the variable `time` to correspond to stimulus onset and have converted the units to seconds, the baseline period corresponds to readings between -0.1 and 0 seconds. 
+
+```{r}
+pupil_data <- pupil_data %>%
+  group_by(trial) %>%
+  mutate(oor = get_oor(ts = pupil, samp_freq = 500,
+                       lim = c(-0.75, 1.25), 
+                       baseline = between(time, -.1, 0),
+                       artifacts = artifact)) %>%
+  ungroup()
+```
+
+# `plot_artifacts`
+
+Inspect plots of the algorithm's performance and manually flag artifacts or remove trials as needed. 
+
+```{r, fig.height=8, fig.width=8, warning = FALSE}
+pupil_data %>% 
+  plot_artifacts(time, pupil, artifact, oor, trial) +
+  xlab("time (s)") +
+  ylab("pupil area")
+```
+
+In the above plot, the red bands indicate regions of the time series that have been identified as signal artifacts. The blue bands indicate regions of the time series that exceed the limits placed on relative change from baseline. In this case, this region reflects more than a 75% decrease in pupil area from the start of the trial, which exceeds the amount of change that a psychological stimulus can plausibly evoke.
+
+# `fix_artifacts`
+
+Remove the artifacts using `fix_artifacts` and store the results in a new variable called `pupil_corrected`. 
+
+```{r}
+pupil_data <- pupil_data %>%
+  group_by(trial) %>%
+  mutate(pupil_corrected = fix_artifacts(ts = pupil,
+                                         samp_freq = 500,
+                                         lim = c(-0.75, 1.25),
+                                         baseline = between(time, -.1, 0),
+                                         artifacts = artifact)) %>%
+  ungroup()
+```
+
+# `plot_comparison`
+
+Compare the original vs. the cleaned time series using `plot_comparison`, and make sure you are satisfied with the performance of the cleaning functions.
+
+```{r, fig.height=8, fig.width=8, warning = FALSE}
+plot_comparison(pupil_data, time, pupil, pupil_corrected, trial)
+```
+
+Note the trials that are being rejected for interpolation (the ones without a green curve). Let's "zoom in" on those by combining a `dplyr::filter` to `plot_artifacts`. 
+
+```{r, warning=FALSE, fig.height=4, fig.width=8}
+bad_trials <- pupil_data %>% filter(is.na(pupil_corrected)) %>%
+  select(trial) %>% distinct %>% unlist
+pupil_data %>% filter(trial %in% bad_trials) %>%
+  plot_artifacts(time, pupil, artifact, oor, trial)
+```
+
+These trials are being dropped because `get_artifacts` identified artifact periods longer than 1 second (the `max_gap` default setting). You of course must decide on whether the default `max_gap` and `lim` settings are reasonable for your experiment, and, if not, where to draw these lines.
+
+# `normalize`
+
+Normalize each `pupil_corrected` time series by centering and scaling to the first 100 ms prior to the onset of the IAPS images. After the time series has been normalized, discard the baseline period. (Your final time series should start at 0.)
+
+This is done to correct for differences in intercept between participants and between trials within the same participant. Our assumptions here are that the first 100 ms still reflects dilation to the grey screen presented prior to the IAPS image, and this value should be fixed to a constant both within and between subjects because between-subject differences in dilation to the fixation screen likely reflect nuisance variables--e.g., differences in eye size, light reflex, or other irrelevant factors that are not the focus of the experiment--and within-subject differences over time in dilation to the fixation screen likely reflect measurement noise--e.g., equipment imprecision, random drift in the pupil response over time unrelated to the experiment, or carryover effects from previous trials.
+    
+```{r}
+pupil_data <- filter(pupil_data, time >= -0.1) %>%
+  group_by(trial) %>% 
+  mutate(pupil_normed = normalize(ts = pupil_corrected,
+                                  baseline = time < 0)) %>%
+  filter(time >= 0)
+```
+
+# `low_pass_filter`
+
+Smooth the `pupil_normed` time series using a 4 Hz low-pass filter.
+
+```{r}
+pupil_data <- pupil_data %>%
+  group_by(trial) %>% 
+  mutate(pupil_smoothed = low_pass_filter(ts = pupil_normed,
+                                          samp_freq = 500))
+```
+
+Plot comparison of pre-smoothed vs. post-smoothed. To visualize what this is doing to the data, you need to zoom in on a single time series. (Fitting all of the trials into one point makes the curves seem smoother to the eye than they actually are.)
+
+```{r, warning = FALSE}
+pupil_data %>% filter(trial == 1) %>%
+  plot_comparison(time, pupil_normed, pupil_smoothed, trial)
+```

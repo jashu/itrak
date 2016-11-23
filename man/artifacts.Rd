@@ -9,7 +9,8 @@
 \usage{
 get_artifacts(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9)
 
-get_oor(ts, samp_freq, lim, baseline = NULL, artifacts = NULL, ...)
+get_oor(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
+  artifacts = NULL)
 
 fix_artifacts(ts, samp_freq, lim = NULL, baseline = NULL,
   artifacts = NULL, ..., max_gap = 1, max_loss = 0.5)
@@ -38,6 +39,10 @@ and positive limits, respectively, of relative change from baseline
 that is plausible for your time series. (See section "Advice on setting
 \code{lim} argument" for more information and examples.)}
 
+\item{...}{further arguments passed to \code{get_artifacts} from
+\code{get_oor} or \code{fix_artifacts} if it has not already been used to
+create an \code{artifacts} vector.}
+
 \item{baseline}{Logical vector indicating which parts of the time series
 correspond to the baseline period. This is used as a reference for
 determining whether values exceed the limits of relative change set in the
@@ -49,10 +54,6 @@ provides logical indexing into which entries of the time series correspond
 to artifacts. This can be obtained by first calling \code{get_artifacts}. If
 not supplied by the user, then \code{fix_artifacts} will call
 \code{get_artifacts} itself.}
-
-\item{...}{further arguments passed to \code{get_artifacts} from
-\code{get_oor} or \code{fix_artifacts} if it has not already been used to
-create an \code{artifacts} vector.}
 
 \item{max_gap}{Maximum gap in seconds that an artifact period is allowed to
 span. Default value is 1 second, meaning if more than half of the time series

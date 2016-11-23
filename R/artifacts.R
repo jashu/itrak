@@ -143,49 +143,6 @@ NULL
 #' @export
 #' @rdname artifacts
 get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
-  #============================================================================
-  # local helper functions
-  #----------------------------------------------------------------------------
-  ## eliminate "data islands" between artifacts (periods less than min_cont)
-  merge_artifacts <- function(artifacts){
-    runs <- rle(artifacts)
-    island <- which(runs$lengths < margin & !runs$values)
-    if(length(island) > 0){
-      for (i in seq_along(island)){
-        start_index <- sum(runs$lengths[0:(island[i] - 1)]) + 1
-        end_index <- sum(runs$lengths[1:island[i]])
-        artifacts[start_index:end_index] <- TRUE
-      }
-    }
-    artifacts
-  }
-  ## expand artifact to include margin (period equal to min_cont)
-  buffer_artifacts <- function(artifacts){
-    runs <- rle(artifacts)
-    n_runs <- length(runs$values)
-    if(n_runs < 2) return(artifacts)
-    pivots <- cumsum(runs$lengths)
-    for(i in 1:(n_runs-1)){
-      period <- ts[pivots[i]:pivots[i+1]]
-      if(runs$values[i]){
-        if(i == 1) period <-ts[1:pivots[i]] else next
-      }
-      # find center of artifact
-      dist_from_left <- median(which(period == min(period)))
-      dist_from_right <- length(period) - dist_from_left
-      center <- pivots[i] + dist_from_left
-      if(runs$values[i]) center <- dist_from_left
-      # expand artifact to be symmetrical about center
-      dist_from_center <- dist_from_left
-      if(dist_from_right > dist_from_left) dist_from_center <- dist_from_right
-      onset <- center - dist_from_center - margin/2
-      if(onset < 1) onset <- 1
-      offset <- center + dist_from_center + margin/2
-      if(offset > length(artifacts)) offset <- length(artifacts)
-      artifacts[onset:offset] <- TRUE
-    }
-    artifacts
-  }
   #=============================================================================
   # check that time series does not have negative values
   #-----------------------------------------------------------------------------
@@ -205,9 +162,9 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   artifact[ts == 0] <- TRUE; forward <- artifact; backward <- artifact
   forward[2:length(ts)] <- abs(diff(ts)) > max_v
   backward[(length(ts)-1):1] <- abs(diff(ts[length(ts):1])) > max_v
-  artifact <- merge_artifacts(artifact | forward | backward)
-  artifact <- buffer_artifacts(artifact)
-  artifact <- merge_artifacts(artifact)
+  artifact <- merge_artifacts(artifact | forward | backward, margin)
+  artifact <- buffer_artifacts(artifact, margin)
+  artifact <- merge_artifacts(artifact, margin)
 
   #=============================================================================
   # if there are any artifacts, run the algorithm again on the corrected ts
@@ -219,12 +176,13 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   if(all(is.na(new_ts))) return(artifact)
   artifact <- artifact |
     get_artifacts(new_ts, samp_freq, min_cont, max_velocity)
-  merge_artifacts(artifact)
+  merge_artifacts(artifact, margin)
 }
 
 #' @export
 #' @rdname artifacts
-get_oor <- function(ts, samp_freq, lim, baseline = NULL, artifacts = NULL, ...){
+get_oor <- function(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
+                    artifacts = NULL){
   # obtain cleaned time series without any constraints on max_loss or max_gap
   ts <- fix_artifacts(ts = ts, samp_freq = samp_freq, baseline = baseline,
                       artifacts = artifacts, ..., max_gap = Inf, max_loss = 1)
@@ -232,9 +190,9 @@ get_oor <- function(ts, samp_freq, lim, baseline = NULL, artifacts = NULL, ...){
   if(is.null(baseline)) baseline <- rep(TRUE, length(ts))
   min_lim <- median(ts[baseline]) * (1+lim[1])
   max_lim <- median(ts[baseline]) * (1+lim[2])
-
+  margin <- floor(samp_freq * min_cont)
   # return logical test for which parts of time series exceed lim argument
-  ts < min_lim | ts > max_lim
+  merge_artifacts(ts < min_lim | ts > max_lim, margin)
 }
 
 #' @export
@@ -251,7 +209,8 @@ fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
   # as artifacts
   if(!is.null(lim)){
     artifacts <- artifacts |
-      get_oor(ts, samp_freq, lim, baseline, artifacts, ...)
+      get_oor(ts, samp_freq, lim, ...,
+              baseline = baseline, artifacts = artifacts)
     artifacts <- artifacts | is.na(artifacts)
   }
   # set observations flagged as artifacts to missing

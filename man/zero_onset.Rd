@@ -2,7 +2,7 @@
 % Please edit documentation in R/zero_onset.R
 \name{zero_onset}
 \alias{zero_onset}
-\title{Zero Time Index to Trial Onset}
+\title{Zero Time Index to Event Onset}
 \usage{
 zero_onset(time, marker, onset)
 }
@@ -10,17 +10,19 @@ zero_onset(time, marker, onset)
 \item{time}{Numeric vector of sample indicies or time stamps corresponding to
 a single time series.}
 
-\item{marker}{Vector containing the indicator of trial \code{onset}.}
+\item{marker}{Vector containing markers of trial events.}
 
-\item{onset}{Value of \code{marker} that indicates when the trial begins.}
+\item{onset}{Label in \code{marker} that indicates the onset event to which
+the time series should be zeroed. If this label is a character string, it
+must be enclosed in quotation marks.}
 }
 \value{
-Numeric vector that zeros \code{time} to the trial onset. In the
+Numeric vector that zeroes \code{time} to the trial onset. In the
 event that no onset marker is found, a warning is issued and a vector of
 \code{NA}s is returned.
 }
 \description{
 Centers the sample index or time stamp of your time series to a reference
-marker, such that 0 always coincides with the onset of a trial.
+marker, such that 0 always coincides with the onset of a particular event.
 }
 

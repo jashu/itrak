@@ -16,7 +16,8 @@
 #' @export
 
 merge_eyes <- function(left, right){
-  left <- as.numeric(left); right <- as.numeric(right)
+  suppressWarnings(left <- as.numeric(left))
+  suppressWarnings(right <- as.numeric(right))
   eyes <- cbind(left, right)
   rowMeans(eyes, na.rm = TRUE)
 }

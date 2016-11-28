@@ -20,13 +20,12 @@ Imports:
     ggplot2,
     dplyr,
     lazyeval
-Suggests:
-    tidyverse
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 5.0.1
 URL: http://github.com/jashu/itrak
 BugReports: http://github.com/jashu/itrak/issues
 Suggests: knitr,
-    rmarkdown
+          rmarkdown,
+          tidyverse
 VignetteBuilder: knitr

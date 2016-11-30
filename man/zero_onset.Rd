@@ -4,7 +4,7 @@
 \alias{zero_onset}
 \title{Zero Time Index to Event Onset}
 \usage{
-zero_onset(time, marker, onset)
+zero_onset(time, marker, event)
 }
 \arguments{
 \item{time}{Numeric vector of sample indicies or time stamps corresponding to
@@ -12,7 +12,7 @@ a single time series.}
 
 \item{marker}{Vector containing markers of trial events.}
 
-\item{onset}{Label in \code{marker} that indicates the onset event to which
+\item{event}{Label in \code{marker} that indicates the onset event to which
 the time series should be zeroed. If this label is a character string, it
 must be enclosed in quotation marks.}
 }

@@ -8,7 +8,7 @@
 #'
 #' @param marker Vector containing markers of trial events.
 #'
-#' @param onset Label in \code{marker} that indicates the onset event to which
+#' @param event Label in \code{marker} that indicates the onset event to which
 #' the time series should be zeroed. If this label is a character string, it
 #' must be enclosed in quotation marks.
 #'
@@ -18,10 +18,10 @@
 #'
 #' @export
 
-zero_onset <- function(time, marker, onset){
-  onset_time <- time[!is.na(marker) & marker == onset]
+zero_onset <- function(time, marker, event){
+  onset_time <- time[!is.na(marker) & marker == event]
   if(length(onset_time) == 0){
-    warning (paste(onset, "not found in onset marker"))
+    warning (paste(event, "not found in onset marker"))
     return(rep(NA, length(time)))
   }
   if(length(onset_time) > 1)

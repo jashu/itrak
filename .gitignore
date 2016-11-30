@@ -1,3 +1,8 @@
 .Rproj.user
 .Rhistory
 .RData
+.Ruserdata
+.DS_Store
+.git
+inst/doc
+.gitignore

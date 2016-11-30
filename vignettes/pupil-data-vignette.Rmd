@@ -12,7 +12,7 @@ vignette: >
 This vignette provides a walk-through of how to clean a pupil-measurement time series using `itrak` and `tidyverse`. Each section describes the use of a different `itrak` function. It is important that these functions be applied in the same sequence given here.
 
 ```{r, message = FALSE}
-library(itrak); library(tidyverse)
+library(tidyverse)
 ```
 
 # `pupil_data`
@@ -193,7 +193,7 @@ plot_comparison(data = pupil_data,
 
 Note the trials that are being rejected for interpolation (the ones without a green curve). Let's "zoom in" on those by combining a `dplyr::filter` to `plot_artifacts`. 
 
-```{r, warning=FALSE, fig.height=4, fig.width=8}
+```{r, fig.height=4, fig.width=8}
 bad_trials <- pupil_data %>% filter(is.na(pupil_corrected)) %>%
   select(trial) %>% distinct %>% unlist
 pupil_data %>% filter(trial %in% bad_trials) %>%
@@ -218,7 +218,7 @@ pupil_data <- filter(pupil_data, time >= -0.1) %>%
 
 Note that if `plot_comparison` is used to compare a pre-normed vs. post-normed time series, the difference in scale is automatically detected and the `pre` time series is rescaled to match the scale of the `post` time series (to a close approximation). In this case, if there is no `post` time series (e.g., `fix_artifacts` returned the time series as missing data because the `pre` time series contained too many artifacts), the `pre` time series will not be plotted.
 
-```{r}
+```{r, fig.height=8, fig.width=8}
 plot_comparison(data = pupil_data,
                 time = time,
                 pre = pupil,

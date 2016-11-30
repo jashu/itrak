@@ -1,5 +1,5 @@
 ## ---- message = FALSE----------------------------------------------------
-library(itrak); library(tidyverse)
+library(tidyverse)
 
 ## ------------------------------------------------------------------------
 pupil_data <- rename(pupil_data, id = RECORDING_SESSION_LABEL)
@@ -92,7 +92,7 @@ plot_comparison(data = pupil_data,
                 post = pupil_corrected,
                 trial = trial)
 
-## ---- warning=FALSE, fig.height=4, fig.width=8---------------------------
+## ---- fig.height=4, fig.width=8------------------------------------------
 bad_trials <- pupil_data %>% filter(is.na(pupil_corrected)) %>%
   select(trial) %>% distinct %>% unlist
 pupil_data %>% filter(trial %in% bad_trials) %>%
@@ -105,7 +105,7 @@ pupil_data <- filter(pupil_data, time >= -0.1) %>%
                                   baseline = time < 0)) %>%
   filter(time >= 0)
 
-## ------------------------------------------------------------------------
+## ---- fig.height=8, fig.width=8------------------------------------------
 plot_comparison(data = pupil_data,
                 time = time,
                 pre = pupil,

@@ -15,7 +15,9 @@ pupil_data <- pupil_data %>%
 
 ## ------------------------------------------------------------------------
 pupil_data <- pupil_data %>%
-  mutate(trial = label_trial(SAMPLE_INDEX, SAMPLE_MESSAGE, "IAPSOnset")) %>%
+  mutate(trial = label_trial(sample = SAMPLE_INDEX,
+                             marker = SAMPLE_MESSAGE,
+                             event = "IAPSOnset")) %>%
   filter(!is.na(trial)) %>%
   select(-SAMPLE_INDEX)
 
@@ -26,13 +28,18 @@ n_trials
 ## ------------------------------------------------------------------------
 pupil_data <- pupil_data %>%
   group_by(trial) %>%
-  mutate(time = zero_onset(TIMESTAMP, SAMPLE_MESSAGE, "IAPSOnset")) %>%
+  mutate(time = zero_onset(time = TIMESTAMP,
+                           marker = SAMPLE_MESSAGE,
+                           event = "IAPSOnset")) %>%
   ungroup() %>%
   select(-SAMPLE_MESSAGE, -TIMESTAMP)
 
 ## ------------------------------------------------------------------------
 pupil_data <- pupil_data %>% 
-  clip_trials(trial, time, -1000, 6000)
+  clip_trials(trial = trial,
+              time = time,
+              start = -1000,
+              stop = 6000)
 # The following is only necessary if you are missing one or more samples, but
 # it can be safely run regardless. (It will leave the data unchanged if there
 # is nothing to fix.)
@@ -58,9 +65,13 @@ pupil_data <- pupil_data %>%
                        artifacts = artifact)) %>%
   ungroup()
 
-## ---- fig.height=8, fig.width=8, warning = FALSE-------------------------
-pupil_data %>% 
-  plot_artifacts(time, pupil, artifact, oor, trial) +
+## ---- fig.height=8, fig.width=8------------------------------------------
+plot_artifacts(data = pupil_data,
+               time = time,
+               measure = pupil,
+               artifacts = artifact,
+               oor = oor,
+               trial = trial) +
   xlab("time (s)") +
   ylab("pupil area")
 
@@ -74,8 +85,12 @@ pupil_data <- pupil_data %>%
                                          artifacts = artifact)) %>%
   ungroup()
 
-## ---- fig.height=8, fig.width=8, warning = FALSE-------------------------
-plot_comparison(pupil_data, time, pupil, pupil_corrected, trial)
+## ---- fig.height=8, fig.width=8------------------------------------------
+plot_comparison(data = pupil_data,
+                time = time,
+                pre = pupil,
+                post = pupil_corrected,
+                trial = trial)
 
 ## ---- warning=FALSE, fig.height=4, fig.width=8---------------------------
 bad_trials <- pupil_data %>% filter(is.na(pupil_corrected)) %>%
@@ -91,6 +106,13 @@ pupil_data <- filter(pupil_data, time >= -0.1) %>%
   filter(time >= 0)
 
 ## ------------------------------------------------------------------------
+plot_comparison(data = pupil_data,
+                time = time,
+                pre = pupil,
+                post = pupil_normed,
+                trial = trial)
+
+## ------------------------------------------------------------------------
 pupil_data <- pupil_data %>%
   group_by(trial) %>% 
   mutate(pupil_smoothed = low_pass_filter(ts = pupil_normed,
@@ -98,5 +120,8 @@ pupil_data <- pupil_data %>%
 
 ## ---- warning = FALSE----------------------------------------------------
 pupil_data %>% filter(trial == 1) %>%
-  plot_comparison(time, pupil_normed, pupil_smoothed, trial)
+  plot_comparison(time = time,
+                  pre = pupil_normed,
+                  post = pupil_smoothed,
+                  trial = trial)
 

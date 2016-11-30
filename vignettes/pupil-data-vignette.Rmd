@@ -17,7 +17,7 @@ library(itrak); library(tidyverse)
 
 # `pupil_data`
 
-The sample `pupil_data` included with the `itrak` package contains 9 experimental trials + 3 drift checks collected from an EyeLink 1000, sampling pupil area from a single eye at a frequency of 500 Hz. Each experimental trial includes a 2-second baseline period, followed by the presentation of an affective image for 6 seconds. `pupil_data` contains the following columns:
+The sample `pupil_data` included with the `itrak` package contains 9 experimental trials + 3 drift checks collected from an EyeLink 1000, sampling pupil area from a single eye at a frequency of 500 Hz. Each experimental trial includes a 2-second baseline period, followed by the presentation of an affective image from the International Affective Picture System (IAPS) for 6 seconds. `pupil_data` contains the following columns:
 
 - `"RECORDING_SESSION_LABEL"`: a unique index that identifies a single recording session. This will be renamed to `id` for short.
 
@@ -58,7 +58,9 @@ Create trial numbers using `label_trial`. Following this, you can drop the `SAMP
 
 ```{r}
 pupil_data <- pupil_data %>%
-  mutate(trial = label_trial(SAMPLE_INDEX, SAMPLE_MESSAGE, "IAPSOnset")) %>%
+  mutate(trial = label_trial(sample = SAMPLE_INDEX,
+                             marker = SAMPLE_MESSAGE,
+                             event = "IAPSOnset")) %>%
   filter(!is.na(trial)) %>%
   select(-SAMPLE_INDEX)
 ```
@@ -77,7 +79,9 @@ Identify when each trial starts using the function `zero_onset`. This will set t
 ```{r}
 pupil_data <- pupil_data %>%
   group_by(trial) %>%
-  mutate(time = zero_onset(TIMESTAMP, SAMPLE_MESSAGE, "IAPSOnset")) %>%
+  mutate(time = zero_onset(time = TIMESTAMP,
+                           marker = SAMPLE_MESSAGE,
+                           event = "IAPSOnset")) %>%
   ungroup() %>%
   select(-SAMPLE_MESSAGE, -TIMESTAMP)
 ```
@@ -90,7 +94,10 @@ For this sample data set, there is a baseline period of roughly 2 seconds before
 
 ```{r}
 pupil_data <- pupil_data %>% 
-  clip_trials(trial, time, -1000, 6000)
+  clip_trials(trial = trial,
+              time = time,
+              start = -1000,
+              stop = 6000)
 # The following is only necessary if you are missing one or more samples, but
 # it can be safely run regardless. (It will leave the data unchanged if there
 # is nothing to fix.)
@@ -132,20 +139,34 @@ pupil_data <- pupil_data %>%
 
 # `plot_artifacts`
 
-Inspect plots of the algorithm's performance and manually flag artifacts or remove trials as needed. 
+Inspect plots of the algorithm's performance and adjust artifact sensitivity settings as needed. 
 
-```{r, fig.height=8, fig.width=8, warning = FALSE}
-pupil_data %>% 
-  plot_artifacts(time, pupil, artifact, oor, trial) +
+```{r, fig.height=8, fig.width=8}
+plot_artifacts(data = pupil_data,
+               time = time,
+               measure = pupil,
+               artifacts = artifact,
+               oor = oor,
+               trial = trial) +
   xlab("time (s)") +
   ylab("pupil area")
 ```
 
-In the above plot, the red bands indicate regions of the time series that have been identified as signal artifacts. The blue bands indicate regions of the time series that exceed the limits placed on relative change from baseline. In this case, this region reflects more than a 75% decrease in pupil area from the start of the trial, which exceeds the amount of change that a psychological stimulus can plausibly evoke.
+## Adjust sensitivity of artifact detection with `max_velocity` argument
+
+In the above plot, the red bands indicate regions of the time series that have been identified as signal artifacts. If there appear to be too many false positives (red bands covering periods of valid signal), try increasing the `max_velocity` setting in the call to `get_artifacts`. (The default is 0.9.) If there appear to be too many false negatives (signal spikes not being labeled in red), try decreasing the `max_velocity` setting.  
+
+## Calibrate the identification of out-of-range periods with `lim` argument
+
+The blue bands indicate regions of the time series that exceed the limits placed on relative change from baseline, as given by the `lim` argument in the call to `get_oor`. In Trial 9 above, this region reflects more than a 75% decrease in pupil area from the start of the trial, which exceeds the amount of change that a psychological stimulus can plausibly evoke. If you feel that valid signal periods are being identified as out-of-range, try widening the `lim` range; conversely, narrow the `lim` range if there is an implausible amount of change that is not being identified as out-of-range. Once you decide on a good `lim` setting, be sure to apply the same setting to all of your time series, and use it when you apply the `fix_artifacts` function (see next step). 
+
+## Control merging and buffering of artifacts with `min_cont` argument
+
+The `min_cont` argument (short for "minimum continuity") is used by both the `get_artifacts` and `get_oor` functions. This is used to define the minimum amount of good data that must exist between two artifact periods in order for them not to be merged into a single artifact period, and it also controls the amount of buffer added to either side of the artifact to insure that transition periods between artifactual and valid data are included as part of the artifact. The default setting here is 0.2 seconds, which is approximately the smallest window of time in which a measurable change in pupil diameter can take place.
 
 # `fix_artifacts`
 
-Remove the artifacts using `fix_artifacts` and store the results in a new variable called `pupil_corrected`. 
+Remove the artifacts using `fix_artifacts` and store the results in a new variable called `pupil_corrected`. Use the same `lim` and `baseline` settings that were used for the `get_oor` function call above.
 
 ```{r}
 pupil_data <- pupil_data %>%
@@ -162,8 +183,12 @@ pupil_data <- pupil_data %>%
 
 Compare the original vs. the cleaned time series using `plot_comparison`, and make sure you are satisfied with the performance of the cleaning functions.
 
-```{r, fig.height=8, fig.width=8, warning = FALSE}
-plot_comparison(pupil_data, time, pupil, pupil_corrected, trial)
+```{r, fig.height=8, fig.width=8}
+plot_comparison(data = pupil_data,
+                time = time,
+                pre = pupil,
+                post = pupil_corrected,
+                trial = trial)
 ```
 
 Note the trials that are being rejected for interpolation (the ones without a green curve). Let's "zoom in" on those by combining a `dplyr::filter` to `plot_artifacts`. 
@@ -191,9 +216,21 @@ pupil_data <- filter(pupil_data, time >= -0.1) %>%
   filter(time >= 0)
 ```
 
+Note that if `plot_comparison` is used to compare a pre-normed vs. post-normed time series, the difference in scale is automatically detected and the `pre` time series is rescaled to match the scale of the `post` time series (to a close approximation). In this case, if there is no `post` time series (e.g., `fix_artifacts` returned the time series as missing data because the `pre` time series contained too many artifacts), the `pre` time series will not be plotted.
+
+```{r}
+plot_comparison(data = pupil_data,
+                time = time,
+                pre = pupil,
+                post = pupil_normed,
+                trial = trial)
+```
+
+Note that all time series now start at 0 and the units reflect relative change from time 0.
+
 # `low_pass_filter`
 
-Smooth the `pupil_normed` time series using a 4 Hz low-pass filter.
+Smooth the `pupil_normed` time series using a 4 Hz low-pass filter. You can change the frequency of the filter with the optional `filter_freq` argument. (4 Hz is the default.)
 
 ```{r}
 pupil_data <- pupil_data %>%
@@ -202,9 +239,12 @@ pupil_data <- pupil_data %>%
                                           samp_freq = 500))
 ```
 
-Plot comparison of pre-smoothed vs. post-smoothed. To visualize what this is doing to the data, you need to zoom in on a single time series. (Fitting all of the trials into one point makes the curves seem smoother to the eye than they actually are.)
+To visualize what this is doing to the data, apply `plot_comparison` to the pre-smoothed vs. post-smoothed data. You may need to zoom in on a single time series (this example selects Trial 1) to see the change in smoothness because plotting multiple trials in the same graph may lower the resolution and make the unfiltered curves look smoother than they actually are.
 
 ```{r, warning = FALSE}
 pupil_data %>% filter(trial == 1) %>%
-  plot_comparison(time, pupil_normed, pupil_smoothed, trial)
+  plot_comparison(time = time,
+                  pre = pupil_normed,
+                  post = pupil_smoothed,
+                  trial = trial)
 ```

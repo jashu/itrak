@@ -13,7 +13,7 @@ get_oor(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
   artifacts = NULL)
 
 fix_artifacts(ts, samp_freq, lim = NULL, baseline = NULL,
-  artifacts = NULL, ..., max_gap = 1, max_loss = 0.5)
+  artifacts = NULL, ..., min_cont = 0.2, max_gap = 1, max_loss = 0.5)
 }
 \arguments{
 \item{ts}{A time series, passed as a numeric vector of chronologically

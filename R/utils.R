@@ -13,15 +13,15 @@ merge_artifacts <- function(artifacts, margin){
 }
 
 ## expand artifact to include margin (period equal to min_cont)
-buffer_artifacts <- function(artifacts, margin){
+buffer_artifacts <- function(ts, artifacts, margin){
   runs <- rle(artifacts)
   n_runs <- length(runs$values)
   if(n_runs < 2) return(artifacts)
   pivots <- cumsum(runs$lengths)
   for(i in 1:(n_runs-1)){
-    period <- artifacts[pivots[i]:pivots[i+1]]
+    period <- ts[pivots[i]:pivots[i+1]]
     if(runs$values[i]){
-      if(i == 1) period <-artifacts[1:pivots[i]] else next
+      if(i == 1) period <- ts[1:pivots[i]] else next
     }
     # find center of artifact
     dist_from_left <- median(which(period == min(period)))

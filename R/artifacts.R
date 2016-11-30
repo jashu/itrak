@@ -163,7 +163,7 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   forward[2:length(ts)] <- abs(diff(ts)) > max_v
   backward[(length(ts)-1):1] <- abs(diff(ts[length(ts):1])) > max_v
   artifact <- merge_artifacts(artifact | forward | backward, margin)
-  artifact <- buffer_artifacts(artifact, margin)
+  artifact <- buffer_artifacts(ts, artifact, margin)
   artifact <- merge_artifacts(artifact, margin)
 
   #=============================================================================
@@ -193,7 +193,7 @@ get_oor <- function(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
   margin <- floor(samp_freq * min_cont)
   # return logical test for which parts of time series exceed lim argument
   oor <- merge_artifacts(ts < min_lim | ts > max_lim, margin)
-  oor <- buffer_artifacts(oor, margin)
+  oor <- buffer_artifacts(ts, oor, margin)
   merge_artifacts(oor, margin)
 }
 

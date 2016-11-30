@@ -34,7 +34,7 @@ pupil measurements into units of relative change from baseline.
 To learn more about \code{itrak}, start with the vignettes:
 \code{browseVignettes(package = "itrak")}. Note that if you have installed
 this package using \code{\link[devtools]{install_github}}, you need to add
-`build_vignettes = TRUE` to \code{devtools::install_github} to be able to
+\code{build_vignettes = TRUE} to \code{devtools::install_github} to be able to
 access the vignettes in this way.
 }
 

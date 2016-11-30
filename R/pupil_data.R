@@ -1,0 +1,27 @@
+#' Sample Time Series of Pupil Area
+#'
+#' A sample of 12 time series containing measurements of pupil area used by
+#' the "pupil-data-vignette" to illustrate the use of \code{\link{itrak}}
+#' functions.
+#'
+#' @format A data frame with 41652 rows and 6 variables:
+#' \describe{
+#'   \item{RECORDING_SESSION_LABEL}{index key for the eye-tracking session}
+#'   \item{SAMPLE_INDEX}{index of consecutive integers indicating the
+#'         temporal order of the observations of each trial in the session}
+#'   \item{SAMPLE_MESSAGE}{field for "stamping" events in an eye-tracking
+#'         session, such as the onset of a visual stimulus}
+#'   \item{TIMESTAMP}{the computer clock time associated with each observation,
+#'         in units of milliseconds}
+#'   \item{LEFT_PUPIL_SIZE}{measured area of the left pupil}
+#'   \item{RIGHT_PUPIL_SIZE}{measured area of the right pupil, empty here
+#'         as the right pupil was not measured}}
+#'
+#' @source Data were collected in the Mood Disorders Laboratory at the
+#' University of Texas at Austin using an EyeLink 1000. The data shown here
+#' are a selection of 9 experimental trials and 3 drift-correction calibrations
+#' from a longer experimental session consisting of 90 trials, each involving
+#' a 2-second baseline period of viewing a gray screen followed by 6 seconds
+#' of viewing an image from the International Affective Picture System (IAPS).
+
+"pupil_data"

@@ -2,20 +2,18 @@
 % Please edit documentation in R/plot_comparison.R
 \name{plot_comparison}
 \alias{plot_comparison}
-\title{Plot Comparison of Original vs. Cleaned Time Series}
+\title{Plot Comparison of Time Series}
 \usage{
-plot_comparison(data, time, orig, clean, trial = NULL)
+plot_comparison(data, time, pre, post, trial = NULL)
 }
 \arguments{
 \item{data}{Data frame containing both time series.}
 
 \item{time}{Name of variable that gives time units.}
 
-\item{orig}{Name of variable containing the original (uncleaned) time series
-of measures.}
+\item{pre}{Name of variable containing the pre-processed time series.}
 
-\item{clean}{Name of variable containing the cleaned time series of
-measures.}
+\item{post}{Name of variable containing the post-processed time series.}
 
 \item{trial}{If the data contains multiple time series, name of the variable
 that identifies each time series. Will be plotted using \code{facet_wrap}.}

@@ -55,21 +55,21 @@ plot_artifacts <- function(data, time, measure, artifacts, oor = NULL,
   IQR <- quantile(measure, c(.25, .75), na.rm = TRUE)
   ymin <- IQR[1] - (1.5 * (IQR[2] - IQR[1]))
   ymax <- IQR[2] + (1.5 * (IQR[2] - IQR[1]))
-  measure_data <- data_frame(time = time,
-                           measure = measure,
-                           artifacts = artifacts,
-                           oor = oor,
-                           trial = trial)
-  artifacts <- measure_data %>% filter(artifacts)
-  oor <- measure_data %>% filter(oor)
-  ggplot() +
+  measure[is.na(measure)] <- -Inf
+  measure_data <- tibble::data_frame(time = time,
+                                     measure = measure,
+                                     artifacts = artifacts,
+                                     oor = oor,
+                                     trial = trial)
+  artifacts <- dplyr::filter(measure_data, artifacts)
+  oor <- dplyr::filter(measure_data, oor)
+  ggplot() + facet_wrap(~trial) +
     geom_line(aes(time, measure), measure_data) +
     geom_vline(aes(xintercept = time), artifacts,
                color = "red", linetype = "dotted") +
     geom_vline(aes(xintercept = time), oor,
                color = "blue", linetype = "dotted") +
-    scale_y_continuous(limits = c(ymin, ymax)) +
-    facet_wrap(~trial) +
+    coord_cartesian(ylim = c(ymin, ymax)) +
     ylab("") +
     theme_bw()
 }

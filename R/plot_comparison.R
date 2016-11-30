@@ -1,4 +1,4 @@
-#' Plot Comparison of Original vs. Cleaned Time Series
+#' Plot Comparison of Time Series
 #'
 #' \code{plot_comparison} helps to visualize the transformation of your original
 #' time series into a subsequent, cleaner version.
@@ -15,53 +15,56 @@
 #'
 #' @param time Name of variable that gives time units.
 #'
-#' @param orig Name of variable containing the original (uncleaned) time series
-#' of measures.
+#' @param pre Name of variable containing the pre-processed time series.
 #'
-#' @param clean Name of variable containing the cleaned time series of
-#' measures.
+#' @param post Name of variable containing the post-processed time series.
 #'
 #' @param trial If the data contains multiple time series, name of the variable
 #'  that identifies each time series. Will be plotted using \code{facet_wrap}.
 #'
 #' @export
 
-plot_comparison <- function(data, time, orig, clean, trial = NULL){
+plot_comparison <- function(data, time, pre, post, trial = NULL){
   arguments <- as.list(match.call())
   if(!is.null(data)){
     time <- eval(arguments$time,data)
-    orig <- eval(arguments$orig,data)
-    clean <- eval(arguments$clean,data)
+    pre <- eval(arguments$pre,data)
+    post <- eval(arguments$post,data)
     trial <- eval(arguments$trial, data)
   }
+  if(all(is.na(pre)) && all(is.na(post)))
+    stop("There are no data to plot.")
   if(is.null(trial)){
     trial <- rep(1, length(time))
   }
-  # scale original ts to match clean ts
-  scale_ts <- function(orig, clean){
-    start <- floor(length(orig) * 0.05)
-    mean_diff <- mean(orig[1:start], na.rm = T) -
-      mean(clean[1:start], na.rm = T)
-    sd_orig <- sd(orig, na.rm = T)
-    sd_clean <- sd(clean, na.rm = T)
-    (orig - mean_diff) / (sd_orig / sd_clean)
+  # scale old ts to match new ts
+  scale_ts <- function(pre, post){
+    start <- floor(length(pre) * 0.05)
+    mean_diff <- mean(pre[1:start], na.rm = T) -
+      mean(post[1:start], na.rm = T)
+    sd_pre <- sd(pre, na.rm = T)
+    sd_post <- sd(post, na.rm = T)
+    (pre - mean_diff) / (sd_pre / sd_post)
   }
   data <- data_frame(time = time,
-                     orig = orig,
-                     clean = clean,
+                     pre = pre,
+                     post = post,
                      trial = trial)
-  med_orig <- median(orig, na.rm = T)
-  med_clean <- median(clean, na.rm = T)
-  if(!dplyr::between(med_orig/med_clean, .5, 1.5)){
+  med_pre <- median(pre, na.rm = T)
+  med_post <- median(post, na.rm = T)
+  if(!is.na(med_pre) && !is.na(med_post) &&
+     !dplyr::between(med_pre/med_post, .5, 1.5)){
     data <- dplyr::group_by(data, trial)
-    data <- dplyr::mutate(data, orig = scale_ts(orig, clean))
+    data <- dplyr::mutate(data, pre = scale_ts(pre, post))
     data <- dplyr::ungroup(data)
   }
+  data$pre[is.na(data$pre)] <- -Inf
+  data$post[is.na(data$post)] <- -Inf
   ggplot(data) +
-    geom_line(aes(time, orig), color = "red") +
-    geom_line(aes(time, clean), color = "green") +
+    geom_line(aes(time, pre), color = "red") +
+    geom_line(aes(time, post), color = "green") +
     facet_wrap(~trial) +
-    scale_y_continuous(limits = range(clean, na.rm = T)) +
+    coord_cartesian(ylim = range(post, na.rm = T)) +
     ylab("") +
     theme_bw()
 }

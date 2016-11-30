@@ -75,7 +75,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <p>This vignette provides a walk-through of how to clean a pupil-measurement time series using <code>itrak</code> and <code>tidyverse</code>. Each section describes the use of a different <code>itrak</code> function. It is important that these functions be applied in the same sequence given here.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(itrak); <span class="kw">library</span>(tidyverse)</code></pre></div>
 <div id="pupil_data" class="section level1">
 <h1><code>pupil_data</code></h1>
 <p>The sample <code>pupil_data</code> included with the <code>itrak</code> package contains 9 experimental trials + 3 drift checks collected from an EyeLink 1000, sampling pupil area from a single eye at a frequency of 500 Hz. Each experimental trial includes a 2-second baseline period, followed by the presentation of an affective image from the International Affective Picture System (IAPS) for 6 seconds. <code>pupil_data</code> contains the following columns:</p>

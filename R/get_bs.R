@@ -28,6 +28,8 @@
 
 #'
 #' @seealso \code{\link{get_tlbs}} for trial-level bias score
+#'
+#' @importFrom stats weighted.mean
 #' @export
 
 get_bs <- function(RT, congruent, prior_weights = NULL){

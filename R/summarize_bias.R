@@ -139,6 +139,7 @@
 #'                    trial = rep(1:10, 10))
 #'
 #' # Use dplyr to sort by trial and group by id and then generate bias summary:
+#' library(dplyr)
 #' data %>%
 #' arrange(id, trial) %>%
 #' group_by(id) %>%
@@ -147,6 +148,8 @@
 #' @seealso \code{\link{get_bs}}, \code{\link{get_tlbs}},
 #' \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{summarize}}
 #'
+#' @importFrom stats weighted.mean
+#' @import dplyr
 #' @export
 
 summarize_bias <- function(data, RT, congruent, prior_weights,
@@ -166,9 +169,8 @@ summarize_bias <- function(data, RT, congruent, prior_weights,
   if(min_wt <= 0) mean_wt <- mean_wt + abs(min_wt) + 1
   mean_wt[is.na(mean_wt)] <- 0
   data$mean_wt <- mean_wt
-  data <- dplyr::mutate(data,
-                        tlbs = get_tlbs(RT, congruent, prior_weights,
-                                        method, search_limit, fill_gaps))
+  data <- mutate(data, tlbs = get_tlbs(RT, congruent, prior_weights,
+                                       method, search_limit, fill_gaps))
   var_wt <- function(wt){
     wt <- abs(diff(wt))
     wt <- max(wt, na.rm = T) - wt + 1
@@ -176,21 +178,21 @@ summarize_bias <- function(data, RT, congruent, prior_weights,
     wt
   }
 
-  dplyr::summarize(data,
-                   mean_bias = get_bs(RT, congruent, prior_weights),
-                   mean_toward = weighted.mean(tlbs[tlbs > 0],
-                                               mean_wt[tlbs > 0],
-                                               na.rm = T),
-                   mean_away = -1 * weighted.mean(tlbs[tlbs < 0],
-                                                  mean_wt[tlbs < 0],
-                                                  na.rm = T),
-                   peak_toward = tlbs[which.max(tlbs * mean_wt)],
-                   peak_away = -1 * tlbs[which.min(tlbs * mean_wt)],
-                   variability = weighted.mean(abs(diff(tlbs)),
-                                               var_wt(prior_weights),
-                                               na.rm = T),
-                   trials_toward = sum(!is.na(tlbs[tlbs > 0])),
-                   trials_away = sum(!is.na(tlbs[tlbs < 0])),
-                   trials_NA = sum(is.na(tlbs)),
-                   trials_total = n())
+  summarize(data,
+            mean_bias = get_bs(RT, congruent, prior_weights),
+            mean_toward = weighted.mean(tlbs[tlbs > 0],
+                                      mean_wt[tlbs > 0],
+                                      na.rm = T),
+            mean_away = -1 * weighted.mean(tlbs[tlbs < 0],
+                                         mean_wt[tlbs < 0],
+                                         na.rm = T),
+            peak_toward = tlbs[which.max(tlbs * mean_wt)],
+            peak_away = -1 * tlbs[which.min(tlbs * mean_wt)],
+            variability = weighted.mean(abs(diff(tlbs)),
+                                        var_wt(prior_weights),
+                                        na.rm = T),
+            trials_toward = sum(!is.na(tlbs[tlbs > 0])),
+            trials_away = sum(!is.na(tlbs[tlbs < 0])),
+            trials_NA = sum(is.na(tlbs)),
+            trials_total = n())
 }

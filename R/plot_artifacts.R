@@ -33,7 +33,9 @@
 #'
 #' @param trial If the data contains multiple time series, name of the variable
 #'  that identifies each time series. Will be plotted using \code{facet_wrap}.
-#'
+
+#' @importFrom stats quantile
+#' @import ggplot2
 #' @export
 
 plot_artifacts <- function(data, time, measure, artifacts, oor = NULL,

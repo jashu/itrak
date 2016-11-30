@@ -13,9 +13,9 @@
 #'
 #' The \code{mad_lim} argument is evaluated using the \emph{double MAD}, which
 #' provides for robust identification of outliers even when the underlying
-#' distribution is non-normal and/or asymmetric. See \href{
-#' http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{
-#' Peter Rosenmai's blog post} for more information.
+#' distribution is non-normal and/or asymmetric. See
+#' \href{http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{Peter Rosenmai's blog post}
+#' for more information.
 #'
 #' @param measure A numeric vector.
 #'
@@ -55,9 +55,8 @@
 #' is_outlier(rt, abs_lim = c(250, 2500), mad_lim = 2.5)
 #'
 #' @references
-#' Rosenmai P. 2013. \href{
-#' http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{
-#' Using the median absolute deviation to find outliers.}
+#' Rosenmai P. 2013.
+#' \href{http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{Using the median absolute deviation to find outliers.}
 #'
 #' @export
 
@@ -85,6 +84,8 @@ is_outlier <- function(measure, abs_lim = NULL, mad_lim = NULL, sd_lim = NULL){
   outlier
 }
 
+#' @importFrom stats median
+
 DoubleMAD <- function(x, zero.mad.action="warn"){
   # The zero.mad.action determines the action in the event of an MAD of zero.
   # Possible values: "stop", "warn", "na" and "warn and na".
@@ -103,6 +104,8 @@ DoubleMAD <- function(x, zero.mad.action="warn"){
   }
   return(c(left.mad, right.mad))
 }
+
+#' @importFrom stats median
 
 DoubleMADsFromMedian <- function(x, zero.mad.action="warn"){
   # The zero.mad.action determines the action in the event of an MAD of zero.

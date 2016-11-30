@@ -16,6 +16,7 @@
 #' @return Copy of data frame reduced to the range of times given by
 #' \code{start} and \code{stop}.
 #'
+#' @importFrom stats setNames
 #' @export
 #'
 clip_trials <- function(data, trial, time, start, stop){

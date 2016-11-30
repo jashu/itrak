@@ -1,5 +1,5 @@
 ## ---- message = FALSE----------------------------------------------------
-library(tidyverse)
+library(itrak); library(tidyverse)
 
 ## ------------------------------------------------------------------------
 pupil_data <- rename(pupil_data, id = RECORDING_SESSION_LABEL)

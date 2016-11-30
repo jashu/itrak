@@ -140,6 +140,7 @@
 #' @name artifacts
 NULL
 
+#' @importFrom stats quantile
 #' @export
 #' @rdname artifacts
 get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
@@ -179,6 +180,7 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   merge_artifacts(artifact, margin)
 }
 
+#' @importFrom stats median
 #' @export
 #' @rdname artifacts
 get_oor <- function(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
@@ -197,6 +199,7 @@ get_oor <- function(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
   merge_artifacts(oor, margin)
 }
 
+#' @importFrom stats median
 #' @export
 #' @rdname artifacts
 fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,

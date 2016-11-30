@@ -12,7 +12,7 @@ vignette: >
 This vignette provides a walk-through of how to clean a pupil-measurement time series using `itrak` and `tidyverse`. Each section describes the use of a different `itrak` function. It is important that these functions be applied in the same sequence given here.
 
 ```{r, message = FALSE}
-library(tidyverse)
+library(itrak); library(tidyverse)
 ```
 
 # `pupil_data`

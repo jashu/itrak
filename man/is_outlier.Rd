@@ -40,9 +40,9 @@ standard-deviation test.
 
 The \code{mad_lim} argument is evaluated using the \emph{double MAD}, which
 provides for robust identification of outliers even when the underlying
-distribution is non-normal and/or asymmetric. See \href{
-http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{
-Peter Rosenmai's blog post} for more information.
+distribution is non-normal and/or asymmetric. See
+\href{http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{Peter Rosenmai's blog post}
+for more information.
 }
 \examples{
 # Create example time series of 10 reaction times in ms with two trials that
@@ -66,8 +66,7 @@ is_outlier(rt, abs_lim = c(250, 2500), mad_lim = 2.5)
 
 }
 \references{
-Rosenmai P. 2013. \href{
-http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{
-Using the median absolute deviation to find outliers.}
+Rosenmai P. 2013.
+\href{http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{Using the median absolute deviation to find outliers.}
 }
 

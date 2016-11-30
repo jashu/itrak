@@ -151,6 +151,7 @@ data <- data.frame(id = rep(1:10, each = 10),
                    trial = rep(1:10, 10))
 
 # Use dplyr to sort by trial and group by id and then generate bias summary:
+library(dplyr)
 data \%>\%
 arrange(id, trial) \%>\%
 group_by(id) \%>\%

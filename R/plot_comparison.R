@@ -22,6 +22,8 @@
 #' @param trial If the data contains multiple time series, name of the variable
 #'  that identifies each time series. Will be plotted using \code{facet_wrap}.
 #'
+#' @importFrom stats median sd
+#' @import ggplot2
 #' @export
 
 plot_comparison <- function(data, time, pre, post, trial = NULL){
@@ -46,10 +48,10 @@ plot_comparison <- function(data, time, pre, post, trial = NULL){
     sd_post <- sd(post, na.rm = T)
     (pre - mean_diff) / (sd_pre / sd_post)
   }
-  data <- data_frame(time = time,
-                     pre = pre,
-                     post = post,
-                     trial = trial)
+  data <- tibble::data_frame(time = time,
+                             pre = pre,
+                             post = post,
+                             trial = trial)
   med_pre <- median(pre, na.rm = T)
   med_post <- median(post, na.rm = T)
   if(!is.na(med_pre) && !is.na(med_post) &&

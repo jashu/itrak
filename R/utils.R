@@ -13,6 +13,8 @@ merge_artifacts <- function(artifacts, margin){
 }
 
 ## expand artifact to include margin (period equal to min_cont)
+#' @importFrom stats median
+
 buffer_artifacts <- function(ts, artifacts, margin){
   runs <- rle(artifacts)
   n_runs <- length(runs$values)

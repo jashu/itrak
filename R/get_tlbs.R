@@ -87,7 +87,7 @@
 #'      main = "Weighted-trials method")
 #' plot(trial, unweighted, type = "l",
 #'      main = "Nearest-trial method")
-
+#' @importFrom stats weighted.mean
 #' @export
 
 get_tlbs <- function(RT, congruent, prior_weights = NULL, method = "weighted",

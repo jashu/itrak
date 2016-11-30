@@ -192,13 +192,16 @@ get_oor <- function(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
   max_lim <- median(ts[baseline]) * (1+lim[2])
   margin <- floor(samp_freq * min_cont)
   # return logical test for which parts of time series exceed lim argument
-  merge_artifacts(ts < min_lim | ts > max_lim, margin)
+  oor <- merge_artifacts(ts < min_lim | ts > max_lim, margin)
+  oor <- buffer_artifacts(oor, margin)
+  merge_artifacts(oor, margin)
 }
 
 #' @export
 #' @rdname artifacts
 fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
-                          artifacts = NULL, ..., max_gap = 1, max_loss = 0.5){
+                          artifacts = NULL, ..., min_cont = 0.2,
+                          max_gap = 1, max_loss = 0.5){
   # store the number of observations in the time series as 'n'
   n <- length(ts)
   # if no logical vector of artifacts has been passed, run get_artifacts
@@ -209,7 +212,7 @@ fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
   # as artifacts
   if(!is.null(lim)){
     artifacts <- artifacts |
-      get_oor(ts, samp_freq, lim, ...,
+      get_oor(ts, samp_freq, lim, ..., min_cont = min_cont,
               baseline = baseline, artifacts = artifacts)
     artifacts <- artifacts | is.na(artifacts)
   }

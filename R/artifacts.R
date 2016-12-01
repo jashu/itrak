@@ -143,6 +143,7 @@ NULL
 #' @importFrom stats quantile
 #' @export
 #' @rdname artifacts
+
 get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   #=============================================================================
   # check that time series does not have negative values
@@ -170,9 +171,9 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   #=============================================================================
   # if there are any artifacts, run the algorithm again on the corrected ts
   #-----------------------------------------------------------------------------
-  if(all(!artifact)) return(artifact)
+  if(all(artifact) || all(!artifact)) return(artifact)
   new_ts <- fix_artifacts(ts, samp_freq, lim = c(-.99, Inf),
-                          artifacts = artifact,
+                          artifacts = artifact, min_cont = min_cont,
                           max_gap = Inf, max_loss = 1)
   if(all(is.na(new_ts))) return(artifact)
   artifact <- artifact |
@@ -183,18 +184,29 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
 #' @importFrom stats median
 #' @export
 #' @rdname artifacts
+
 get_oor <- function(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
                     artifacts = NULL){
+  # if no logical vector of artifacts has been passed, run get_artifacts
+  if(is.null(artifacts)){
+    artifacts <- get_artifacts(ts, samp_freq, ..., min_cont = min_cont)
+  }
   # obtain cleaned time series without any constraints on max_loss or max_gap
-  ts <- fix_artifacts(ts = ts, samp_freq = samp_freq, baseline = baseline,
-                      artifacts = artifacts, ..., max_gap = Inf, max_loss = 1)
+  new_ts <- fix_artifacts(ts = ts, samp_freq = samp_freq, baseline = baseline,
+                          artifacts = artifacts, max_gap = Inf, max_loss = 1)
+  if(all(is.na(new_ts))){
+    ts[artifacts] <- NA_real_
+  } else {
+    ts <- new_ts
+  }
   # determine absolute limits based on relative limits and baseline period
-  if(is.null(baseline)) baseline <- rep(TRUE, length(ts))
+  if(is.null(baseline)) baseline <- !is.na(ts)
   min_lim <- median(ts[baseline]) * (1+lim[1])
   max_lim <- median(ts[baseline]) * (1+lim[2])
   margin <- floor(samp_freq * min_cont)
   # return logical test for which parts of time series exceed lim argument
-  oor <- merge_artifacts(ts < min_lim | ts > max_lim, margin)
+  oor <- !artifacts & (ts < min_lim | ts > max_lim)
+  oor <- merge_artifacts(oor, margin)
   oor <- buffer_artifacts(ts, oor, margin)
   merge_artifacts(oor, margin)
 }
@@ -211,6 +223,12 @@ fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
   if(is.null(artifacts)){
     artifacts <- get_artifacts(ts, samp_freq, ...)
   }
+  # if the proportion of artifacts exceeds the max_loss threshold, set all
+  # values of the time series to missing and return
+  if(sum(artifacts) / length(artifacts) > max_loss){
+    ts[] <- NA_real_
+    return(ts)
+  }
   # if limits have been passed, run get_oor and label out-of-range samples
   # as artifacts
   if(!is.null(lim)){
@@ -218,12 +236,15 @@ fix_artifacts <- function(ts, samp_freq, lim = NULL, baseline = NULL,
       get_oor(ts, samp_freq, lim, ..., min_cont = min_cont,
               baseline = baseline, artifacts = artifacts)
     artifacts <- artifacts | is.na(artifacts)
+    # if the proportion of artifacts now exceeds the max_loss threshold, set all
+    # values of the time series to missing and return
+    if(sum(artifacts) / length(artifacts) > max_loss){
+      ts[] <- NA_real_
+      return(ts)
+    }
   }
   # set observations flagged as artifacts to missing
   ts[artifacts] <- NA_real_
-  # if the proportion of artifacts exceeds the max_loss threshold, set all
-  # values of the time series to missing
-  if(sum(artifacts) / length(artifacts) > max_loss) ts[] <- NA_real_
   # calculate the run-lengths of consecutive artifact vs. artifact-free periods
   # across the whole time series
   runs <- rle(artifacts)

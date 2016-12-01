@@ -191,6 +191,8 @@ get_oor <- function(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
   if(is.null(artifacts)){
     artifacts <- get_artifacts(ts, samp_freq, ..., min_cont = min_cont)
   }
+  # if the entire time series is one big artifact, abort and return all FALSE
+  if(all(artifacts)) return(!artifacts)
   # obtain cleaned time series without any constraints on max_loss or max_gap
   new_ts <- fix_artifacts(ts = ts, samp_freq = samp_freq, baseline = baseline,
                           artifacts = artifacts, max_gap = Inf, max_loss = 1)
@@ -199,10 +201,13 @@ get_oor <- function(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
   } else {
     ts <- new_ts
   }
+  # if no baseline period is specified or if the baseline period consists
+  # entirely of missing values, use all non-missing values from the time
+  # series as the basis for calculating min/max limits
+  if(is.null(baseline) || all(is.na(ts[baseline]))) baseline <- !is.na(ts)
   # determine absolute limits based on relative limits and baseline period
-  if(is.null(baseline)) baseline <- !is.na(ts)
-  min_lim <- median(ts[baseline]) * (1+lim[1])
-  max_lim <- median(ts[baseline]) * (1+lim[2])
+  min_lim <- median(ts[baseline], na.rm = TRUE) * (1+lim[1])
+  max_lim <- median(ts[baseline], na.rm = TRUE) * (1+lim[2])
   margin <- floor(samp_freq * min_cont)
   # return logical test for which parts of time series exceed lim argument
   oor <- !artifacts & (ts < min_lim | ts > max_lim)

@@ -3,20 +3,22 @@
 #' \code{get_tlbs} calculates the trial-level bias score (TL-BS) as described by
 #' Zvielli et al. (2015).
 #'
-#' Attention bias tasks, such as the dot probe, consist of congruent trials
-#' (CTs) and incongruent trials (ITs). Traditionally, a bias score is computed
-#' by taking the mean of all CTs and subtracting it from the mean of all ITs,
-#' i.e., \eqn{bias = IT - CT}. Zvielli et al. (2015) proposed a trial-level bias
-#' score (TL-BS), which computes a bias score for every trial by comparing it to
-#' the most temporally proximal trial of opposite type. If the \code{method}
-#' argument is set to \code{"nearest"}, \code{get_tlbs} implements this
-#' nearest-trial method of calcualting TL-BS. By default
-#' (\code{method = "weighted"}) \code{get_tlbs} uses an alternative
-#' weighted-trials method that calculates the weighted mean of all trials of
-#' opposite type, with closer trials weighted more heavily than more distant
-#' trials (as a function of the inverse square of trial distance.) To calculate
-#' TLBS, each CT is subtracted from the weighted mean of all ITs, and the
-#' weighted mean of all CTs is subtracted from each IT.
+#' Attention bias tasks such as the dot probe consist of congruent trials
+#' (CTs), in which the location of the probe matches the location of an
+#' emotional stimulus, and incongruent trials (ITs), in which the location of
+#' the probe matches the location of the neutral stimulus. Traditionally, a bias
+#' score is computed by taking the mean reaction time of all CTs and subtracting
+#' it from the mean reaction time of all ITs, i.e., \eqn{bias = IT - CT}.
+#' Zvielli et al. (2015) proposed a trial-level bias score (TL-BS), which
+#' computes a bias score for every trial by comparing it to the most temporally
+#' proximal trial of opposite type. If the \code{method} argument is set to
+#' \code{"nearest"}, \code{get_tlbs} implements this nearest-trial method of
+#' calculating TL-BS. By default (\code{method = "weighted"}) \code{get_tlbs}
+#' uses an alternative weighted-trials method that calculates the weighted mean
+#' of all trials of opposite type, with closer trials weighted more heavily than
+#' more distant trials (as a function of the inverse square of trial distance.)
+#' To calculate TLBS, each CT is subtracted from the weighted mean of all ITs,
+#' and the weighted mean of all CTs is subtracted from each IT.
 #'
 #' The two methods yield highly similar TL-BS numbers, but the weighted method
 #' may be preferable for two reasons: 1) In the event that a trial of one type
@@ -41,7 +43,8 @@
 #'
 #' @param congruent A logical vector equal in length to \code{RT} that indicates
 #'  whether the corresponding entry of \code{RT} is a congruent (\code{TRUE}) or
-#'  incongruent (\code{FALSE}) trial.
+#'  incongruent (\code{FALSE}) trial, i.e., whether the probe location matches
+#'  the location of the stimulus expected to elicit attention bias.
 #'
 #' @param prior_weights Optional numeric vector of prior weights indicating the
 #'  relative influence that each trial should have on the calculation of TLBS

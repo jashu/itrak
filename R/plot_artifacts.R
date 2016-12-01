@@ -8,7 +8,7 @@
 #' \code{\link{get_artifacts}} and optionally \code{\link{get_oor}} functions on
 #' one or more time series. If many artifacts are going undetected, try
 #' decreasing the \code{max_velocity} setting. If there are too many false
-#' positives, try increaasing it.
+#' positives, try increasing it.
 #'
 #' Plotting is performed using \code{\link[ggplot2]{ggplot}} and you can modify
 #' the aesthetics of the plot by appending layers using the \code{+} operator.

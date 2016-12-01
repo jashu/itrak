@@ -18,8 +18,9 @@
         as the right pupil was not measured}}}
 \source{
 Data were collected in the Mood Disorders Laboratory at the
-University of Texas at Austin using an EyeLink 1000. The data shown here
-are a selection of 9 experimental trials and 3 drift-correction calibrations
+University of Texas at Austin using an EyeLink 1000 Plus, sampling pupil area
+from a single eye at a frequency of 500 Hz. The data shown here are a
+selection of 9 experimental trials and 3 drift-correction calibrations
 from a longer experimental session consisting of 90 trials, each involving
 a 2-second baseline period of viewing a gray screen followed by 6 seconds
 of viewing an image from the International Affective Picture System (IAPS).

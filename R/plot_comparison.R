@@ -6,7 +6,7 @@
 #' Use this plotting function to evaluate the performance of the
 #' \code{\link{fix_artifacts}}, \code{\link{normalize}}, and/or
 #' \code{\link{low_pass_filter}} functions on cleaning your time series. Note
-#' that if your orignal and cleaned time series are at different scales (e.g.,
+#' that if your original and cleaned time series are at different scales (e.g.,
 #' if you are comparing a pre-normed version to a post-normed version),
 #' the original time series will be projected to the scale of
 #' the cleaned time series.

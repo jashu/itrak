@@ -7,7 +7,7 @@
 zero_onset(time, marker, event)
 }
 \arguments{
-\item{time}{Numeric vector of sample indicies or time stamps corresponding to
+\item{time}{Numeric vector of sample indices or time stamps corresponding to
 a single time series.}
 
 \item{marker}{Vector containing markers of trial events.}

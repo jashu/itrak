@@ -3,7 +3,7 @@
 #' Centers the sample index or time stamp of your time series to a reference
 #' marker, such that 0 always coincides with the onset of a particular event.
 #'
-#' @param time Numeric vector of sample indicies or time stamps corresponding to
+#' @param time Numeric vector of sample indices or time stamps corresponding to
 #' a single time series.
 #'
 #' @param marker Vector containing markers of trial events.

@@ -28,11 +28,11 @@ if there are any missing samples.
 \details{
 Due to a variety of factors, trials in an eye-tracking experiment end up
 being somewhat variable in length. \code{clip_trials} is useful for trimming
-multiple trials down to the same length, and it issues a warning if your data
+multiple trials down to identical lengths, issuing a warning if your data
 contain trials that are shorter than the standard length you have specified.
 
 Note that unlike most of the other functions in this package,
-\code{clip_trials} operates on an entire data frame (not individual factors).
+\code{clip_trials} operates on an entire data frame (not individual vectors).
 The data frame must contain a column specifying trial number and a column
 specifying time. The names of these columns should be passed, without quotes,
 to the \code{trial} and \code{time} parameters, respectively.

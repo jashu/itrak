@@ -3,11 +3,21 @@
 #' \code{get_bs} returns the mean difference between congruent and incongruent
 #' trials.
 #'
+#' Attention bias tasks such as the dot probe consist of congruent trials
+#' (CTs), in which the location of the probe matches the location of an
+#' emotional stimulus, and incongruent trials (ITs), in which the location of
+#' the probe matches the location of the neutral stimulus. \code{get_bs}
+#' calculates a traditional bias score by taking the mean reaction time of all
+#' CTs and subtracting it from the mean reaction time of all ITs, i.e.,
+#' \eqn{bias = IT - CT}, with the option to use weighted means based on prior
+#' trial weights.
+#'
 #' @param RT A numeric vector of reaction times in chronological order.
 #'
 #' @param congruent A logical vector equal in length to \code{RT} that indicates
 #'  whether the corresponding entry of \code{RT} is a congruent (\code{TRUE}) or
-#'  incongruent (\code{FALSE}) trial.
+#'  incongruent (\code{FALSE}) trial, i.e., whether the probe location matches
+#'  the location of the stimulus expected to elicit attention bias.
 #'
 #' @param prior_weights Optional numeric vector of prior weights indicating the
 #'  relative influence that each trial should have on the calculation of

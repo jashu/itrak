@@ -15,7 +15,9 @@ chronologically ordered observations of numeric type.}
 
 \item{congruent}{The name of the column in \code{data} that contains logical
 indicators of whether the corresponding entry of \code{RT} is a congruent
-\code{TRUE} or incongruent \code{FALSE} trial.}
+(\code{TRUE}) or incongruent (\code{FALSE}) trial, i.e., whether the probe
+location matches the location of the stimulus expected to elicit attention
+bias.}
 
 \item{prior_weights}{Optional name of column in \code{data} that contains
 prior weights indicating the relative influence that each trial should have
@@ -61,7 +63,7 @@ summary metrics:
  \item{trials_away}{Number of trials during which bias was directed away from
    the target.}
  \item{trials_NA}{Number of trials for which a trial-level bias score could
-   not be computed, i.e, trial data is missing or a trial of opposite type
+   not be computed, i.e., trial data is missing or a trial of opposite type
    could not be found within the \code{search_limit}}
  \item{trials_total}{Total number of trials detected. Useful as a validity
    check.}
@@ -91,7 +93,7 @@ al. (2015). There are two exceptions.
  \item Calculation of the TL-BS parameters is implemented precisely as
    described by Zvielli et al. with one minor modification: after taking the
    mean and min of the negative trial-level bias scores to obtain the
-   \code{mean_away} and \code{peak_away} parameters, resepectively, the
+   \code{mean_away} and \code{peak_away} parameters, respectively, the
    results are multiplied by -1 to remove the negative sign. The rationale
    for this modification is as follows. First, leaving the negative sign in
    place is redundant since the direction of the bias is given by the name of
@@ -109,7 +111,7 @@ al. (2015). There are two exceptions.
    bias-away scale (becoming less negative) is associated with an increase
    in the other variable and b) recalling that an increase on the bias-away
    scale actually reflects a decrease in attention bias before c) coming to
-   the correct, but counter-intutitive conclusion, that a positive
+   the correct, but counterintuitive conclusion, that a positive
    correlation in this case reflects a negative relationship. Converting
    \code{mean_away} and \code{peak_away} to a positive scale spares the user
    from this future headache.

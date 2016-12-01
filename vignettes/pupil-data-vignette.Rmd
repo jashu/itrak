@@ -17,7 +17,7 @@ library(itrak); library(tidyverse)
 
 # `pupil_data`
 
-The sample `pupil_data` included with the `itrak` package contains 9 experimental trials + 3 drift checks collected from an EyeLink 1000, sampling pupil area from a single eye at a frequency of 500 Hz. Each experimental trial includes a 2-second baseline period, followed by the presentation of an affective image from the International Affective Picture System (IAPS) for 6 seconds. `pupil_data` contains the following columns:
+The sample `pupil_data` included with the `itrak` package contains 9 experimental trials + 3 drift checks collected from an EyeLink 1000 Plus, sampling pupil area from a single eye at a frequency of 500 Hz. Each experimental trial includes a 2-second baseline period, followed by the presentation of an affective image from the International Affective Picture System (IAPS) for 6 seconds. `pupil_data` contains the following columns:
 
 - `"RECORDING_SESSION_LABEL"`: a unique index that identifies a single recording session. This will be renamed to `id` for short.
 

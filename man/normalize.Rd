@@ -21,7 +21,11 @@ relative change (difference from baseline as a fraction of baseline).
 \code{normalize} normalizes the time series to a specified baseline
 reference period using \eqn{(ts-baseline)/baseline} where \eqn{ts} is the
 time series and \eqn{baseline} is the mean of the values belonging to the
-baseline period.
+baseline period. If the baseline period is too unstable (usually an
+indication that \code{\link{get_artifacts}} failed to detect an artifact
+during the baseline period and that its tuning parameters should be
+adjusted), a warning will be issued and normalization will not be performed.
+(A vector of \code{NAs} will be returned.)
 }
 \section{Warning}{
 

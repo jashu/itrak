@@ -3,7 +3,11 @@
 #' \code{normalize} normalizes the time series to a specified baseline
 #' reference period using \eqn{(ts-baseline)/baseline} where \eqn{ts} is the
 #' time series and \eqn{baseline} is the mean of the values belonging to the
-#' baseline period.
+#' baseline period. If the baseline period is too unstable (usually an
+#' indication that \code{\link{get_artifacts}} failed to detect an artifact
+#' during the baseline period and that its tuning parameters should be
+#' adjusted), a warning will be issued and normalization will not be performed.
+#' (A vector of \code{NAs} will be returned.)
 #'
 #' @section Warning:
 #' Interpolation of missing values should be done prior to running this
@@ -30,8 +34,15 @@ normalize <- function(ts, baseline){
     ts[] <- NA_real_
     return(ts)
   }
-  if(any(ts <= 0)) stop(
-"Time series contains negative values. Perhaps it has already been normalized?")
+  if(any(ts <= 0))
+    stop(paste("Time series contains negative values.",
+               "Perhaps it has already been normalized?"))
   baseline_mean = mean(ts[baseline])
-  (ts - baseline_mean) / baseline_mean
+  new_ts <- (ts - baseline_mean) / baseline_mean
+  time0 <- new_ts[!baseline][1]
+  if(abs(time0) > 0.1){
+    warning(paste("Normalization failed due to unstable baseline period."))
+    new_ts[] <- NA_real_
+  }
+  new_ts
 }

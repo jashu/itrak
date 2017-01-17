@@ -156,8 +156,10 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   artifact <- vector("logical", length(ts))
   lag <- floor(samp_freq/50)
   max_v <- quantile(abs(diff(ts[ts > 0], lag = lag)), max_velocity)
+  if(is.na(max_v)){
+    artifact[] <- TRUE; return(artifact)
+  }
   margin <- floor(samp_freq * min_cont)
-
   #=============================================================================
   # artifact-detection algorithm
   #-----------------------------------------------------------------------------

@@ -72,8 +72,10 @@ is_outlier <- function(measure, abs_lim = NULL, mad_lim = NULL, sd_lim = NULL){
   if(!is.null(sd_lim) && (length(sd_lim) != 1 || !is.numeric(sd_lim)))
     stop("The stand. dev. limit must be a single number.")
   outlier <- rep(FALSE, length(measure))
+  outlier <- is.na(measure)
   if(!is.null(abs_lim)){
-    outlier <- !dplyr::between(measure, abs_lim[1], abs_lim[2])
+    outlier[!outlier] <- !dplyr::between(measure[!outlier],
+                                         abs_lim[1], abs_lim[2])
   }
   if(!is.null(mad_lim)){
     outlier[!outlier] <- DoubleMADsFromMedian(measure[!outlier]) > mad_lim

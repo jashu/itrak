@@ -22,4 +22,3 @@ tracked.
 Aggregate parallel time series from the left and right eyes into a single
 time series of measurements.
 }
-

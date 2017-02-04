@@ -2,9 +2,9 @@
 % Please edit documentation in R/artifacts.R
 \name{artifacts}
 \alias{artifacts}
-\alias{fix_artifacts}
 \alias{get_artifacts}
 \alias{get_oor}
+\alias{fix_artifacts}
 \title{Time Series Artifact Detection and Correction}
 \usage{
 get_artifacts(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9)
@@ -158,8 +158,8 @@ lengths, and types of data. Please use \code{\link{plot_artifacts}} to
 inspect the performance of \code{get_artifacts} before continuing with
 \code{fix_artifacts} and any subsequent data cleaning and analysis.
 }
+
 \seealso{
 \code{\link{plot_artifacts}},  \code{\link{plot_comparison}},
  \code{\link{normalize}},  \code{\link{low_pass_filter}}
 }
-

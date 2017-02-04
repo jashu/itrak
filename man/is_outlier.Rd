@@ -69,4 +69,3 @@ is_outlier(rt, abs_lim = c(250, 2500), mad_lim = 2.5)
 Rosenmai P. 2013.
 \href{http://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers}{Using the median absolute deviation to find outliers.}
 }
-

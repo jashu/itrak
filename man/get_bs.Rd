@@ -50,4 +50,3 @@ get_bs(rt, congruent)
 \seealso{
 \code{\link{get_tlbs}} for trial-level bias score
 }
-

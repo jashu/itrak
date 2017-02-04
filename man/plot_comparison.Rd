@@ -31,4 +31,3 @@ if you are comparing a pre-normed version to a post-normed version),
 the original time series will be projected to the scale of
 the cleaned time series.
 }
-

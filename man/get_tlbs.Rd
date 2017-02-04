@@ -104,4 +104,3 @@ attentional bias. \emph{Clinical Psychological Science}. 3(5):772-788.
 \seealso{
 \code{\link{summarize_bias}}, \code{\link{get_bs}}
 }
-

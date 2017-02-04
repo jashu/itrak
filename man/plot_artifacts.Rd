@@ -44,4 +44,3 @@ the aesthetics of the plot by appending layers using the \code{+} operator.
 \seealso{
 \code{\link{get_artifacts}}, \code{\link[ggplot2]{ggplot}}
 }
-

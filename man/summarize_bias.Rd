@@ -144,6 +144,7 @@ corresponds precisely to the same grouping variables used in the call to
 \code{\link[dplyr]{group_by}}.) The result is then ready to be piped to the
 \code{summarize_bias} function.
 }
+
 \examples{
 # Create example data frame containing 10 time series of 10 reaction times
 # and trial types of congruent ('con') vs. incongruent ('incon'):
@@ -168,4 +169,3 @@ attentional bias. \emph{Clinical Psychological Science}. 3(5):772-788.
 \code{\link{get_bs}}, \code{\link{get_tlbs}},
 \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{summarize}}
 }
-

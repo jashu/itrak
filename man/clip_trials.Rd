@@ -53,4 +53,3 @@ an example of how to use this function.
 \seealso{
 \code{\link{label_trials}}, \code{\link{zero_trials}}
 }
-

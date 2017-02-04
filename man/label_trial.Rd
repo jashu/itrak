@@ -51,4 +51,3 @@ trial count and will return a label of \code{NA}. This can then be used as a
 flag for removing extraneous measurements, such as pupil readings taken
 during a drift check or calibration procedure.
 }
-

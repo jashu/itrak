@@ -37,7 +37,7 @@ which can then be used to replace the original time series in a data frame.
 The low-pass filter assumes that the signal should start from 0, and it will
 always return a time series that starts from 0.
 }
+
 \seealso{
 \code{\link{artifacts}}, \code{\link{normalize}}
 }
-

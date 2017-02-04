@@ -34,4 +34,3 @@ the "pupil-data-vignette" to illustrate the use of \code{\link{itrak}}
 functions.
 }
 \keyword{datasets}
-

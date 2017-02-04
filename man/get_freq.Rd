@@ -20,4 +20,3 @@ If you are unsure about the sampling frequency of your time series,
 \code{get_freq} can verify this, provided your data contains a time stamp for
 each measurement.
 }
-

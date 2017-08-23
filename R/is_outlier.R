@@ -76,6 +76,7 @@ is_outlier <- function(measure, abs_lim = NULL, mad_lim = NULL, sd_lim = NULL){
   if(!is.null(abs_lim)){
     outlier[!outlier] <- !dplyr::between(measure[!outlier],
                                          abs_lim[1], abs_lim[2])
+    if(all(outlier)) return(outlier)
   }
   if(!is.null(mad_lim)){
     outlier[!outlier] <- DoubleMADsFromMedian(measure[!outlier]) > mad_lim

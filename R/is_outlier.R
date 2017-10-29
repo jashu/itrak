@@ -71,7 +71,6 @@ is_outlier <- function(measure, abs_lim = NULL, mad_lim = NULL, sd_lim = NULL){
     stop("The MAD limit must be a single number.")
   if(!is.null(sd_lim) && (length(sd_lim) != 1 || !is.numeric(sd_lim)))
     stop("The stand. dev. limit must be a single number.")
-  outlier <- rep(FALSE, length(measure))
   outlier <- is.na(measure)
   if(!is.null(abs_lim)){
     outlier[!outlier] <- !dplyr::between(measure[!outlier],
@@ -84,6 +83,7 @@ is_outlier <- function(measure, abs_lim = NULL, mad_lim = NULL, sd_lim = NULL){
   if(!is.null(sd_lim)){
     outlier[!outlier] <- abs(scale(measure[!outlier])) > sd_lim
   }
+  outlier[is.na(measure)] <- NA
   outlier
 }
 

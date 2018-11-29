@@ -1,3 +1,7 @@
+
+
+
+
 #' @export
 get_gaze_bias <- function(gaze, left, neutral = "Neutral"){
   if(length(gaze) != 2) stop("gaze must be a vector of length 2")

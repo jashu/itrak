@@ -22,7 +22,7 @@ Imports:
     tibble
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 URL: http://github.com/jashu/itrak
 BugReports: http://github.com/jashu/itrak/issues
 Suggests: knitr,

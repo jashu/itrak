@@ -4,7 +4,8 @@
 \alias{plot_artifacts}
 \title{Plot Artifacts}
 \usage{
-plot_artifacts(data, time, measure, artifacts, oor = NULL, trial = NULL)
+plot_artifacts(data, time, measure, artifacts, oor = NULL,
+  trial = NULL)
 }
 \arguments{
 \item{data}{Data frame containing time series.}

@@ -116,7 +116,8 @@ plot_comparison(data = pupil_data,
 pupil_data <- pupil_data %>%
   group_by(trial) %>% 
   mutate(pupil_smoothed = low_pass_filter(ts = pupil_normed,
-                                          samp_freq = 500))
+                                          samp_freq = 500)) %>%
+  ungroup()
 
 ## ---- warning = FALSE----------------------------------------------------
 pupil_data %>% filter(trial == 1) %>%

@@ -236,7 +236,8 @@ Smooth the `pupil_normed` time series using a 4 Hz low-pass filter. You can chan
 pupil_data <- pupil_data %>%
   group_by(trial) %>% 
   mutate(pupil_smoothed = low_pass_filter(ts = pupil_normed,
-                                          samp_freq = 500))
+                                          samp_freq = 500)) %>%
+  ungroup()
 ```
 
 To visualize what this is doing to the data, apply `plot_comparison` to the pre-smoothed vs. post-smoothed data. You may need to zoom in on a single time series (this example selects Trial 1) to see the change in smoothness because plotting multiple trials in the same graph may lower the resolution and make the unfiltered curves look smoother than they actually are.

@@ -153,13 +153,25 @@ get_artifacts <- function(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9){
   #=============================================================================
   # initialize variables
   #-----------------------------------------------------------------------------
+  margin <- ceiling(samp_freq * min_cont)
   artifact <- vector("logical", length(ts))
-  lag <- floor(samp_freq/50)
+  # determine optimal lag for deriving distribution of change values:
+  ## consider lags between 1 and the size of the margin;
+  ## choose smallest lag that yields 95% non-zero differences
+  ## (the minimum interval at which the signal is reliably changing)
+  lag <- 1
+  diff_dist <- diff(ts[ts > 0], lag = lag)
+  p_static <- sum(diff_dist == 0) / length(diff_dist)
+  while(lag < margin && p_static > 0.05){
+    lag <- lag + 1
+    diff_dist <- diff(ts[ts > 0], lag = lag)
+    p_static <- sum(diff_dist == 0) / length(diff_dist)
+  }
   max_v <- quantile(abs(diff(ts[ts > 0], lag = lag)), max_velocity)
   if(is.na(max_v)){
     artifact[] <- TRUE; return(artifact)
   }
-  margin <- floor(samp_freq * min_cont)
+
   #=============================================================================
   # artifact-detection algorithm
   #-----------------------------------------------------------------------------

@@ -123,7 +123,7 @@ tsAB <- function(data, type, value, pos_thresh = 0, neg_thresh = 0){
                                !any(is.na(value[.x])))]
   b_runs <- run_idx[imap_lgl(run_idx, ~ length(.x) > 1 & .y == b &&
                                !any(is.na(value[.x])))]
-  result <- data_frame(
+  result <- tibble(
     trials_total_A = sum(type == a),
     trials_total_B = sum(type == b),
     trials_missed_A = sum(is.na(value[type == a])),

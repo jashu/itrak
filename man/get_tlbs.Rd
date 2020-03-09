@@ -4,8 +4,14 @@
 \alias{get_tlbs}
 \title{Trial-level Bias Score}
 \usage{
-get_tlbs(RT, congruent, prior_weights = NULL, method = "weighted",
-  search_limit = 5, fill_gaps = FALSE)
+get_tlbs(
+  RT,
+  congruent,
+  prior_weights = NULL,
+  method = "weighted",
+  search_limit = 5,
+  fill_gaps = FALSE
+)
 }
 \arguments{
 \item{RT}{A numeric vector of reaction times in chronological order.}

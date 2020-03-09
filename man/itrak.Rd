@@ -3,7 +3,6 @@
 \docType{package}
 \name{itrak}
 \alias{itrak}
-\alias{itrak-package}
 \title{itrak: Tools for Processing Eye-Tracking Data}
 \description{
 \code{itrak} provides functions to facilitate the processing of data from

@@ -4,8 +4,15 @@
 \alias{summarize_bias}
 \title{Summary of attention bias metrics}
 \usage{
-summarize_bias(data, RT, congruent, prior_weights, method = "weighted",
-  search_limit = 5, fill_gaps = FALSE)
+summarize_bias(
+  data,
+  RT,
+  congruent,
+  prior_weights,
+  method = "weighted",
+  search_limit = 5,
+  fill_gaps = FALSE
+)
 }
 \arguments{
 \item{data}{A data frame or table.}

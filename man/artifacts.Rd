@@ -9,21 +9,51 @@
 \usage{
 get_artifacts(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9)
 
-get_oor(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
-  artifacts = NULL)
+get_oor(
+  ts,
+  samp_freq,
+  lim,
+  ...,
+  min_cont = 0.2,
+  baseline = NULL,
+  artifacts = NULL
+)
 
-fix_artifacts(ts, samp_freq, lim = NULL, baseline = NULL,
-  artifacts = NULL, ..., min_cont = 0.2, max_gap = 1,
-  max_loss = 0.5)
+fix_artifacts(
+  ts,
+  samp_freq,
+  lim = NULL,
+  baseline = NULL,
+  artifacts = NULL,
+  ...,
+  min_cont = 0.2,
+  max_gap = 1,
+  max_loss = 0.5
+)
 
 get_artifacts(ts, samp_freq, min_cont = 0.2, max_velocity = 0.9)
 
-get_oor(ts, samp_freq, lim, ..., min_cont = 0.2, baseline = NULL,
-  artifacts = NULL)
+get_oor(
+  ts,
+  samp_freq,
+  lim,
+  ...,
+  min_cont = 0.2,
+  baseline = NULL,
+  artifacts = NULL
+)
 
-fix_artifacts(ts, samp_freq, lim = NULL, baseline = NULL,
-  artifacts = NULL, ..., min_cont = 0.2, max_gap = 1,
-  max_loss = 0.5)
+fix_artifacts(
+  ts,
+  samp_freq,
+  lim = NULL,
+  baseline = NULL,
+  artifacts = NULL,
+  ...,
+  min_cont = 0.2,
+  max_gap = 1,
+  max_loss = 0.5
+)
 }
 \arguments{
 \item{ts}{A time series, passed as a numeric vector of chronologically
@@ -76,57 +106,6 @@ dropped signal and/or artifacts. Default value is 0.5, meaning if more than
 half of the time series consists of artifacts, \code{fix_artifacts} will not
 perform interpolation/extrapolation and instead will return a vector of all
 \code{NA}s.}
-
-\item{ts}{A time series, passed as a numeric vector of chronologically
-ordered, positively valued observations separated by equal intervals of time.}
-
-\item{samp_freq}{Sampling frequency in Hz.}
-
-\item{max_velocity}{Maximum allowable velocity specified in terms of a
-quantile of the distribution of absolute values of first-order differences of
-the time series. Velocities that exceed the value of this quantile will be
-used to identify onset/offset of artifacts. Default value is 0.9 (90th
-percentile). Lower values will lead to greater sensitivity but less
-specificity in identifying signal spikes. Higher values will lead to less
-sensitivity but greater specificity.}
-
-\item{lim}{Two-item numeric vector \code{c(neg, pos)} specifying the negative
-and positive limits, respectively, of relative change from baseline
-that is plausible for your time series. (See section "Advice on setting
-\code{lim} argument" for more information and examples.)}
-
-\item{baseline}{Logical vector indicating which parts of the time series
-correspond to the baseline period. This is used as a reference for
-determining whether values exceed the limits of relative change set in the
-\code{lim} argument. If there is no \code{baseline} provided, the mean of the
-entire series (excluding signal loss) will be used for this reference.}
-
-\item{max_loss}{Maximum fraction of time series that is allowed to contain
-dropped signal and/or artifacts. Default value is 0.5, meaning if more than
-half of the time series consists of artifacts, \code{fix_artifacts} will not
-perform interpolation/extrapolation and instead will return a vector of all
-\code{NA}s.}
-
-\item{max_gap}{Maximum gap in seconds that an artifact period is allowed to
-span. Default value is 1 second, meaning if more than half of the time series
-consists of artifacts, \code{fix_artifacts} will not perform
-interpolation/extrapolation and instead will return a vector of all
-\code{NA}s.}
-
-\item{min_cont}{Minimum continuity in seconds required between artifacts.
-If the period of "good" data between two artifacts is less than this
-threshold, the two artifacts are merged into one. Default value is 0.2
-(200 ms).}
-
-\item{artifacts}{A logical vector of equal length to the time series that
-provides logical indexing into which entries of the time series correspond
-to artifacts. This can be obtained by first calling \code{get_artifacts}. If
-not supplied by the user, then \code{fix_artifacts} will call
-\code{get_artifacts} itself.}
-
-\item{...}{further arguments passed to \code{get_artifacts} from
-\code{get_oor} or \code{fix_artifacts} if it has not already been used to
-create an \code{artifacts} vector.}
 }
 \value{
 \code{get_artifacts} returns a logical vector that can be used for

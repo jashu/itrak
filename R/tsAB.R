@@ -102,7 +102,7 @@ tsAB <- function(data, type, value, pos_thresh = 0, neg_thresh = 0){
     )
     return(bind_cols(attr(data, "labels"), result))
   }
-  if(is.factor(data[[type]])) type <- as.character(data[[type]])
+  type <- as.character(data[[type]])
   value <- data[[value]]
   run_len <- rle(type)
   trans_trials <- cumsum(run_len$lengths) + 1L

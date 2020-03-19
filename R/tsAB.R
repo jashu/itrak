@@ -96,11 +96,12 @@
 tsAB <- function(data, type, value, pos_thresh = 0, neg_thresh = 0){
   if(n_distinct(data[[type]]) != 2) stop("type must have exactly 2 states")
   if(inherits(data, "grouped_df")){
-    indices <- attr(data, "indices") %>% map(~ . + 1L)
+    groups <- attr(data, "groups")
     result <- map_df(
-      indices, ~ tsAB(ungroup(data[.x,]), type, value, pos_thresh, neg_thresh)
+      groups$.rows,
+      ~ tsAB(ungroup(data[.x,]), type, value, pos_thresh, neg_thresh)
     )
-    return(bind_cols(attr(data, "labels"), result))
+    return(bind_cols(groups %>% select(-.rows), result))
   }
   type <- as.character(data[[type]])
   value <- data[[value]]

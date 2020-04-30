@@ -38,34 +38,34 @@ labels given by the \code{type} column.
   a validity check.}
  \item{trials_missed_A}{Number of trials of type A with missing data.}
  \item{trials_missed_B}{Number of trials of type B with missing data.}
- \item{mean_A}{Mean of all trials of type A.}
- \item{mean_B}{Mean of all trials of type B.}
- \item{sd_A}{Standard deviation of all trials of type A.}
- \item{sd_B}{Standard deviation of all trials of type B.}
- \item{pos_response_to_A}{Count of type-A trials above threshold set by
-   \code{pos_thresh}.}
- \item{pos_response_to_B}{Count of type-B trials above threshold set by
-   \code{pos_thresh}.}
- \item{neg_response_to_A}{Count of type-A trials below threshold set by
-   \code{neg_thresh}.}
- \item{neg_response_to_B}{Count of type-B trials below threshold set by
-   \code{neg_thresh}.}
- \item{neu_response_to_A}{Count of type-A trials between thresholds set by
-   \code{neg_thresh} and \code{pos_thresh}.}
- \item{neu_response_to_B}{Count of type-B trials between thresholds set by
-   \code{neg_thresh} and \code{pos_thresh}.}
- \item{mean_A_after_A}{Mean of all trials of type A that follow another trial
-   of type A.}
- \item{mean_B_after_B}{Mean of all trials of type B that follow another trial
-   of type B.}
- \item{mean_A_after_B}{Mean of all trials of type A that immediately follow a
-   trial of type B.}
- \item{mean_B_after_A}{Mean of all trials of type B that immediately follow a
-   trial of type A.}
- \item{diff_A_from_B}{Mean difference of all trials of type A from an
-   immediately preceding trial of type B.}
- \item{diff_B_from_A}{Mean difference of all trials of type B from an
-   immediately preceding trial of type A.}
+ \item{mean_A}{Mean of all non-neutral trials of type A.}
+ \item{mean_B}{Mean of all non-neutral trials of type B.}
+ \item{sd_A}{Standard deviation of all non-neutral trials of type A.}
+ \item{sd_B}{Standard deviation of all non-neutral trials of type B.}
+ \item{pos_response_to_A}{Count of positive type-A trials above threshold set
+  by \code{pos_thresh}.}
+ \item{pos_response_to_B}{Count of positive type-B trials above threshold set
+  by \code{pos_thresh}.}
+ \item{neg_response_to_A}{Count of negative type-A trials below threshold set
+  by \code{neg_thresh}.}
+ \item{neg_response_to_B}{Count of negative type-B trials below threshold set
+  by \code{neg_thresh}.}
+ \item{neu_response_to_A}{Count of neutral type-A trials between thresholds
+  set by \code{neg_thresh} and \code{pos_thresh}.}
+ \item{neu_response_to_B}{Count of neutral type-B trials between thresholds
+  set by \code{neg_thresh} and \code{pos_thresh}.}
+ \item{mean_A_after_A}{Mean of all non-neutral trials of type A that follow
+ another trial of type A.}
+ \item{mean_B_after_B}{Mean of all non-neutral trials of type B that follow
+ another trial of type B.}
+ \item{mean_A_after_B}{Mean of all non-neutral trials of type A that
+ immediately follow a trial of type B.}
+ \item{mean_B_after_A}{Mean of all non-neutral trials of type B that
+ immediately follow a trial of type A.}
+ \item{diff_A_from_B}{Mean difference of all non-neutral trials of type A
+  from an immediately preceding trial of type B.}
+ \item{diff_B_from_A}{Mean difference of all non-neutral trials of type B
+ from an immediately preceding trial of type A.}
  \item{drift_over_A}{Mean linear slope over consecutive trials of type A.}
  \item{drift_over_B}{Mean linear slope over consecutive trials of type B.}
  }

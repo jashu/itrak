@@ -4,7 +4,8 @@
 \name{pupil_data}
 \alias{pupil_data}
 \title{Sample Time Series of Pupil Area}
-\format{A data frame with 41652 rows and 6 variables:
+\format{
+A data frame with 41652 rows and 6 variables:
 \describe{
   \item{RECORDING_SESSION_LABEL}{index key for the eye-tracking session}
   \item{SAMPLE_INDEX}{index of consecutive integers indicating the
@@ -15,7 +16,8 @@
         in units of milliseconds}
   \item{LEFT_PUPIL_SIZE}{measured area of the left pupil}
   \item{RIGHT_PUPIL_SIZE}{measured area of the right pupil, empty here
-        as the right pupil was not measured}}}
+        as the right pupil was not measured}}
+}
 \source{
 Data were collected in the Mood Disorders Laboratory at the
 University of Texas at Austin using an EyeLink 1000 Plus, sampling pupil area
